@@ -429,7 +429,7 @@ details.card .res-words{margin-top:10px}
     </div>
     <p class="rules">Tablero <b>6×6</b> · <b>180 s</b> · palabras de <b>3+ letras</b><br>Cada letra vale <b>1 punto</b>: «gato» = 4, «caramelo» = 8.<br>Arrastra el dedo por letras vecinas, también en diagonal.</p>
     <p class="rules" id="bestLine"></p>
-    <p class="rules" style="opacity:.7;font-size:11px">Versión 1.4</p>
+    <p class="rules" style="opacity:.7;font-size:11px">Versión 1.5</p>
   </section>
 
   <!-- PROFILE -->
@@ -1107,6 +1107,10 @@ function showResults(players){
   const map=new Map();players.forEach((p,pi)=>p.words.forEach(w=>{if(!map.has(w))map.set(w,[]);map.get(w).push(pi)}));
   // order: all 3-letter words first, then 4, 5…, alternating between players inside each length
   const order=[],shownW=new Set();
+  // 1) words found by more than one player, shortest first
+  [...map.entries()].filter(([w,f])=>f.length>1).sort((a,b)=>a[0].length-b[0].length||b[1].length-a[1].length||a[0].localeCompare(b[0],'es'))
+    .forEach(([w,f])=>{shownW.add(w);order.push({w,f,L:w.length,shared:true,pts:dupRule?0:w.length})});
+  // 2) then each player's unique words, by length, alternating between players
   const maxL=Math.max(0,...[...map.keys()].map(w=>w.length));
   for(let L=G.min;L<=maxL;L++){
     const qs=players.map(p=>p.words.filter(w=>w.length===L).sort((a,b)=>a.localeCompare(b,'es')));
@@ -1181,7 +1185,7 @@ function showResults(players){
     mb.classList.add('tracing');
     const col=it.f.length>1?'var(--yellow)':players[it.f[0]].col;mb.style.setProperty('--hc',col);
     pill.className='rword';pill.replaceChildren();fd.replaceChildren();
-    if(it.L!==lastL){lastL=it.L;pl.textContent='Palabras de '+it.L+' letras';}
+    const seg=it.shared?'rep':it.L;if(seg!==lastL){const first=lastL===0;lastL=seg;pl.textContent=it.shared?'Palabras repetidas':(order.some(o=>o.shared)?'Únicas de ':'Palabras de ')+it.L+' letras';if(!first&&!me.skip){callout(it.shared?'¡Palabras repetidas!':'¡Únicas de '+it.L+' letras!');await wait(900)}else if(first&&it.shared&&!me.skip){callout('¡Primero, las repetidas!');await wait(1000)}}
     bi.style.width=((idx+1)/order.length*100)+'%';
     const txt=el('span','t','');pill.append(txt);
     for(let k=0;k<path.length;k++){
