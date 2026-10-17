@@ -429,7 +429,7 @@ details.card .res-words{margin-top:10px}
     </div>
     <p class="rules">Tablero <b>6×6</b> · <b>180 s</b> · palabras de <b>3+ letras</b><br>Cada letra vale <b>1 punto</b>: «gato» = 4, «caramelo» = 8.<br>Arrastra el dedo por letras vecinas, también en diagonal.</p>
     <p class="rules" id="bestLine"></p>
-    <p class="rules" style="opacity:.7;font-size:11px">Versión 1.1</p>
+    <p class="rules" style="opacity:.7;font-size:11px">Versión 1.2</p>
   </section>
 
   <!-- PROFILE -->
@@ -598,7 +598,7 @@ document.addEventListener('pointerdown',()=>ac(),{once:true});
 
 /* ================= CREATURES ================= */
 const SPECIES=[
-  {n:['Chispín','Brasón','Volcanor'],el:'fuego',sh:'round',ears:'pointy',tail:'flame',c:['#ff8a3d','#ffe0a8','#ffd23f'],bg:'#ffe3cf',atk:'Llamarada'},
+  {n:['Fennebreeze','Kitsno','Flammafox','Pyrotae','Cinderine','Magmastor','Inferfox','Volkanox','Volkanox'],spr:'criaturas/fuego-',sprN:8,face:'left',el:'fuego',sh:'round',ears:'pointy',tail:'flame',c:['#ff8a3d','#ffe0a8','#ffd23f'],bg:'#ffe3cf',atk:'Llamarada'},
   {n:['Gotito','Marejo','Abisaurio'],el:'agua',sh:'bean',ears:'fin',tail:'fish',c:['#3a9dff','#cfeaff','#7ff4ff'],bg:'#dcefff',atk:'Hidrochorro'},
   {n:['Brotín','Ramaldo','Bosqueón'],el:'planta',sh:'pear',ears:'none',tail:'leaf',c:['#6fd36a','#eaffd0','#ff8cc0'],bg:'#e2f8dc',atk:'Látigo de ramas'},
   {n:['Voltito','Rayón','Tronadux'],el:'rayo',sh:'round',ears:'long',tail:'bolt',c:['#ffd23f','#fff4c2','#3a3a6a'],bg:'#fff4cc',atk:'Rayo'},
@@ -621,13 +621,34 @@ const SPECIES=[
 ];
 const EL={fuego:'Fuego',agua:'Agua',planta:'Planta',rayo:'Eléctrico',hielo:'Hielo',roca:'Roca',fantasma:'Fantasma',psiquico:'Psíquico',hada:'Hada',veneno:'Veneno',viento:'Viento',sombra:'Sombra',metal:'Metal',tierra:'Tierra',dragon:'Dragón',estelar:'Estelar',arena:'Arena',sonido:'Sonido',dulce:'Dulce',nube:'Nube'};
 const formOf=s=>s<3?0:s<6?1:2;
-const crName=(spi,s)=>(SPECIES[spi]||SPECIES[0]).n[formOf(s)];
+const crName=(spi,s)=>{const sp=SPECIES[spi]||SPECIES[0];s=Math.max(0,Math.min(8,s|0));return sp.n.length>=9?sp.n[s]:sp.n[formOf(s)]};
+const crLineOf=sp=>{const u=[...new Set(sp.n)];return u.length>3?u[0]+' → '+u[1]+' → … → '+u[u.length-1]+' ('+u.length+' formas)':u.join(' → ')};
+/* ----- hand-drawn sprites: one image per evolution stage (stage 8 reuses the last one with a legendary aura) ----- */
+const SPR=new Map();let sprRefreshT=0;
+function sprFor(spi,s){
+  const sp=SPECIES[spi];if(!sp||!sp.spr)return null;
+  if(!SPR.has(spi)){SPR.set(spi,Array.from({length:sp.sprN},(_,i)=>{const im=new Image();im.decoding='async';
+    im.onload=()=>{clearTimeout(sprRefreshT);sprRefreshT=setTimeout(sprRefresh,60)};im.src=sp.spr+(i+1)+'.webp';return im}))}
+  const im=SPR.get(spi)[Math.min(s,sp.sprN-1)];return im.complete&&im.naturalWidth?im:null;
+}
+function sprRefresh(){try{if(screen==='sProfile'&&draft)renderProfile();else if(screen==='sMenu')renderMenu();else if(screen==='sLobby')renderLobby()}catch(e){}}
+function drawSprite(c,img,spi,s,t){
+  const sp=SPECIES[spi],a=sp.c[2];s=Math.max(0,Math.min(8,s|0));
+  const size=68+3.6*Math.min(s,7)+(s===8?4:0),bob=Math.sin(t*2.6)*1.1,x=50-size/2,y=97-size+bob;
+  if(s>=4){const g=c.createRadialGradient(50,62,size*.15,50,62,size*.75);g.addColorStop(0,hexA(a,s>=7?.55:.35));g.addColorStop(1,hexA(a,0));c.fillStyle=g;c.beginPath();c.arc(50,62,size*.75,0,Math.PI*2);c.fill()}
+  c.fillStyle='rgba(36,22,63,.16)';c.beginPath();c.ellipse(50,96.5,size*.34,2.6,0,0,Math.PI*2);c.fill();
+  c.drawImage(img,x,y,size,size);
+  if(s>=7){const st=(sx,sy,r,col)=>{c.beginPath();for(let i=0;i<10;i++){const rr=i%2?r*.45:r,an=-Math.PI/2+i*Math.PI/5;c.lineTo(sx+Math.cos(an)*rr,sy+Math.sin(an)*rr)}c.closePath();c.fillStyle=col;c.fill()};
+    for(let i=0;i<6;i++){const an=t*1.4+i*Math.PI/3;st(50+Math.cos(an)*size*.55,78+Math.sin(an)*size*.16,2.6,i%2?a:'#ffe27a')}}
+  if(s===8){c.strokeStyle='#ffd23f';c.lineWidth=1.6;c.globalAlpha*=.8;c.beginPath();c.ellipse(50,84,size*.5,size*.13,0,0,Math.PI*2);c.stroke();c.globalAlpha/=.8}
+}
 function hexA(h,a){const n=parseInt(String(h).replace('#','').slice(0,6),16)||0;return 'rgba('+(n>>16)+','+(n>>8&255)+','+(n&255)+','+a+')'}
 function shade(hex,amt){const n=parseInt(hex.slice(1),16);let r=n>>16,g=n>>8&255,b=n&255;const t=amt<0?0:255,p=Math.abs(amt);r=Math.round(r+(t-r)*p);g=Math.round(g+(t-g)*p);b=Math.round(b+(t-b)*p);return '#'+((1<<24)|(r<<16)|(g<<8)|b).toString(16).slice(1)}
 
 // Draws one creature in a 100×100 box, visually centred on (50,60). s = evolution stage 0..8, t = seconds (idle motion).
 // Style: separate head and body, cel shading (light from top-left), glossy eyes, soft ground shadow.
 function drawCreature(c,spi,s,t){
+  {const img=sprFor(spi,s|0);if(img){drawSprite(c,img,spi,s,t||0);return}}
   const sp=SPECIES[spi]||SPECIES[0],m=sp.c[0],b=sp.c[1],a=sp.c[2],el_=sp.el;
   const ol=shade(m,m==='#f4f8ff'?-.45:-.55),dk='#24163f',wh='#ffffff';
   s=Math.max(0,Math.min(8,s|0));const f=formOf(s),sub=s%3,k=.74+.042*s;
@@ -801,7 +822,7 @@ function drawCreature(c,spi,s,t){
     vol(()=>poly([[hx-w,yb],[hx-w-1,yb-8*k],[hx-w*.45,yb-4*k],[hx,yb-10*k],[hx+w*.45,yb-4*k],[hx+w+1,yb-8*k],[hx+w,yb]]),'#ffd23f',hx,yb-4*k,w,5*k,{ol:'#b07800'});E(hx,yb-3*k,1.8*k,1.8*k);c.fillStyle='#ff5fa2';c.fill()}
   if(s>=7){for(let i=0;i<6;i++){const an=t*1.4+i*Math.PI/3;star(50+Math.cos(an)*R*1.25,by+bry*.3+Math.sin(an)*R*.35,2.4,i%2?a:'#ffe27a')}}
 }
-function placeCr(c,spi,s,x,y,size,flip,t,alpha,rot){c.save();c.translate(x,y);if(rot)c.rotate(rot);if(flip)c.scale(-1,1);c.scale(size/100,size/100);c.translate(-50,-60);c.globalAlpha=alpha==null?1:alpha;drawCreature(c,spi,s,t);c.restore()}
+function placeCr(c,spi,s,x,y,size,flip,t,alpha,rot){if(SPECIES[spi]&&SPECIES[spi].face==='left')flip=!flip;c.save();c.translate(x,y);if(rot)c.rotate(rot);if(flip)c.scale(-1,1);c.scale(size/100,size/100);c.translate(-50,-60);c.globalAlpha=alpha==null?1:alpha;drawCreature(c,spi,s,t);c.restore()}
 function drawCr(cv,spi,s,px,t,bg){
   const dpr=Math.min(3,window.devicePixelRatio||1),S=Math.round(px*dpr);if(cv.width!==S){cv.width=S;cv.height=S}
   const c=cv.getContext('2d');c.setTransform(1,0,0,1,0,0);c.clearRect(0,0,S,S);c.setTransform(S/100,0,0,S/100,0,0);
@@ -828,7 +849,7 @@ function openProfile(){
 function renderProfile(){
   const ci=draft.av.c,sp=SPECIES[ci];
   liveCr($('#profAv'),ci,0,140);
-  $('#crName').textContent=sp.n[0];$('#crEl').textContent=EL[sp.el];$('#crLine').textContent=sp.n.join(' → ');
+  $('#crName').textContent=sp.n[0];$('#crEl').textContent=EL[sp.el];$('#crLine').textContent=crLineOf(sp);
   const strip=$('#evoStrip');strip.replaceChildren();
   for(let s=0;s<=8;s++){const d=el('div');const cv=el('canvas');cv.style.width='100%';drawCr(cv,ci,s,48,0);d.append(cv,el('span',null,s?String(s*25):'0'));strip.append(d)}
   const grid=$('#crGrid');grid.replaceChildren();
@@ -1442,7 +1463,7 @@ function paintCard(cd,v){
 function applyTier(cd,t){
   cd.c.dataset.tier=String(Math.min(t,8));
   cd.pt.textContent=tierName(t);
-  if(cd.crv){const ns=Math.min(t,8);if(ns!==cd.stage){cd.evolved={from:formOf(cd.stage),to:formOf(ns)};cd.stage=ns;liveCr(cd.crv,cd.spi,ns,70);cd.pf.textContent=crName(cd.spi,ns)}}
+  if(cd.crv){const ns=Math.min(t,8);if(ns!==cd.stage){cd.evolved={from:crName(cd.spi,cd.stage),to:crName(cd.spi,ns)};cd.stage=ns;liveCr(cd.crv,cd.spi,ns,70);cd.pf.textContent=crName(cd.spi,ns)}}
 }
 function tierUpFx(cd,t,stage,quiet){
   const c=cd.c;
@@ -1450,7 +1471,7 @@ function tierUpFx(cd,t,stage,quiet){
   const fl=el('div','tier-flash');c.append(fl);setTimeout(()=>fl.remove(),650);
   if(!quiet){const tp=el('div','tier-pop','¡'+tierName(t)+'!');tp.style.setProperty('--tc','var('+(TIER_TOK[Math.min(t,8)]||'--gold')+'-d)');if(t===6)tp.style.setProperty('--tc','var(--pink-d)');if(t>=7)tp.style.setProperty('--tc','var(--cosmos)');c.append(tp);setTimeout(()=>tp.remove(),1350);
     sfx.tierUp(t);vib(t>=5?[40,30,40,30,120]:[30,30,60]);
-    if(cd.crv){c.classList.remove('evolving');void c.offsetWidth;c.classList.add('evolving');sfx.evolve();if(cd.evolved&&cd.evolved.from!==cd.evolved.to&&cd.onEvolve)cd.onEvolve(SPECIES[cd.spi].n[cd.evolved.from],SPECIES[cd.spi].n[cd.evolved.to])}}
+    if(cd.crv){c.classList.remove('evolving');void c.offsetWidth;c.classList.add('evolving');sfx.evolve();if(cd.evolved&&cd.evolved.from!==cd.evolved.to&&cd.onEvolve)cd.onEvolve(cd.evolved.from,cd.evolved.to)}}
   if(stage&&t>=6&&!REDUCE){stage.classList.remove('quake');void stage.offsetWidth;stage.classList.add('quake')}
   if(REDUCE)return;
   const r=c.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2,cols=tierCols(t);
@@ -1507,6 +1528,7 @@ $('#copyInvite').onclick=()=>{const url=STANDALONE?location.origin+location.path
 $('#copyCode').onclick=()=>{const t=roomCode||'';try{navigator.clipboard.writeText(t).then(()=>toast('Código copiado: '+t),()=>toast('Código: '+t))}catch(e){toast('Código: '+t)}};
 
 logo('#logoLoad');
+SPECIES.forEach((sp,i)=>{if(sp.spr)sprFor(i,0)});
 loadDict().then(()=>{renderMenu();if(!profile||profile.v!==2)openProfile();else show('sMenu')}).catch(()=>{$('#loadMsg').textContent='No se ha podido cargar el diccionario. Recarga la página.'});
 })();
 </script>
