@@ -1839,7 +1839,7 @@ function showResults(players){
     setActive(null);mFill.style.height='100%';mDone.lastChild.textContent=String(order.length);
     const topS=Math.max(...totals);const win=totals.map((t,i)=>t===topS?i:-1).filter(i=>i>=0);
     let msg;
-    if(players.length===1)msg=totals[0]>(G.prevBest||0)?'¡Nuevo récord!':totals[0]+' puntos';
+    if(players.length===1)msg=totals[0]>(G.prevBest||0)?'¡Nuevo récord!':totals[0]+' puntos · tu récord: '+(G.prevBest||0);
     else if(win.length>1)msg='¡Empate!';
     else msg=players[win[0]].me?'¡Has ganado!':'¡Gana '+players[win[0]].nick+'!';
     cols.forEach(cd=>{const b=cd.head.querySelector('.lead-badge');if(b)b.remove()});
