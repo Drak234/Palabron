@@ -805,6 +805,26 @@ h2,.scr-title{font-size:clamp(27px,8.4vw,34px)}
 .bcol.win .bbar{box-shadow:inset 0 4px 0 rgba(255,255,255,.45),0 0 0 3px var(--t-yellow),0 0 28px var(--t-yellow)}
 .bcol.lose{opacity:.75}
 @media (max-height:720px){.bp-board{--mw:min(calc(100vw - 150px),24vh,220px)}.bp-chart{height:clamp(220px,33vh,300px)}}
+
+/* =====================================================================
+   TEXT FIT — nothing gets clipped: outlined display text gets room for its
+   outline and accents; long words shrink to fit instead of being cut.
+   ===================================================================== */
+.btn,.slab-face,.cur-word,.bp-pill,.lead-call,.bbar,.rword,.chip,.pill,.bp-seg,.el-tag,.tag-ribbon,.plate-go,.arena-msg{overflow:visible}
+.slab-face{overflow:hidden}.slab-t{padding-block:.08em}
+.plate .lbl{white-space:normal;overflow:visible;line-height:1.2;font-size:10px}
+.plate .nick{line-height:1.25;padding-top:.06em}
+.lead-call{white-space:normal;text-align:center;line-height:1.15;max-width:88%;width:max-content;padding:7px 16px 9px}
+.bbar{padding-top:8px}
+details.card summary .n{white-space:normal;line-height:1.2}
+.bname,.pl .n,.hp .nm span,.hp .nm b,.bp-seg,.opp{line-height:1.3;padding-top:.08em;padding-bottom:.08em}
+.cur-word,.bp-pill{line-height:1.25}
+.cur-word{justify-content:center;max-width:calc(100% - 8px)}
+.bp-pill .t{overflow:visible}
+.prof-info .nick{line-height:1.15;overflow-wrap:anywhere}
+.hud-cell .num,.bsc,.pcard .ps{line-height:1.2}
+#btnStart{margin-bottom:6px}
+body.foot-sm .screen.scroll{padding-bottom:96px}
 </style>
 
 <div id="bg" aria-hidden="true"></div>
@@ -838,7 +858,7 @@ h2,.scr-title{font-size:clamp(27px,8.4vw,34px)}
       <button class="slab" data-theme="lime" id="btnGoHelp" type="button" data-hint="Cómo se forman palabras, cuánto vale cada una y cómo evoluciona tu criatura."><span class="slab-face"><span class="slab-ic"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="12" fill="#fff" stroke="#0d2547" stroke-width="2.6"/><text x="16" y="22" text-anchor="middle" font-family="Lilita One,Arial Black" font-size="17" fill="#0d2547">?</text></svg></span><span class="slab-t">Cómo se juega</span></span></button>
     </nav>
     <p class="rules" id="bestLine"></p>
-    <p class="ver">Versión 2.2</p>
+    <p class="ver">Versión 2.3</p>
   </section>
 
   <!-- JOIN -->
@@ -1218,7 +1238,7 @@ let screen='sLoad';
 function logo(target){const box=$(target);box.replaceChildren();let i=0;['PALA','BRÓN'].forEach(w=>{const ln=el('div','ln');[...w].forEach(ch=>{const sp=el('span',null,ch);sp.style.setProperty('--i',i);sp.style.setProperty('--r',(((i*37)%9)-4)+'deg');i++;ln.append(sp)});box.append(ln)})}
 function renderMenu(){
   logo('#logoMenu');
-  if(profile){liveCr($('#menuAv'),profile.av.c,0,58,SPECIES[profile.av.c].bg);$('#menuNick').textContent=profile.nick;$('#menuCr').textContent=crName(profile.av.c,0)+' · '+EL[SPECIES[profile.av.c].el]}
+  if(profile){liveCr($('#menuAv'),profile.av.c,0,58,SPECIES[profile.av.c].bg);$('#menuNick').textContent=profile.nick;requestAnimationFrame(()=>fitText($('#menuNick'),24,14));$('#menuCr').textContent=crName(profile.av.c,0)+' · '+EL[SPECIES[profile.av.c].el]}
   const best=store.get('best',0);$('#bestLine').textContent=best?'Tu récord: '+best+' puntos':'';
 }
 
@@ -1323,6 +1343,7 @@ function renderLobby(){
   const list=peers.length?peers.map(peerInfo):[{me:true,nick:profile.nick,av:profile.av,pr:{st:'lobby'}}];
   const hp=hostPeer();
   for(const p of list){const row=el('div','pl');row.dataset.k=p.peer||'me';row.append(avCanvas(p.av,42),el('div','n',p.nick));if((hp&&p.peer===hp.peer)||(!hp&&p.me))row.append(el('span','pill host','ANFITRIÓN'));if(p.me)row.append(el('span','pill you','TÚ'));row.append(el('span','pill',statusLabel(p.pr.st)));pl.append(row)}
+  requestAnimationFrame(()=>pl.querySelectorAll('.n').forEach(n=>fitText(n,19,12)));
   if(list.length<2)pl.append(el('div','muted','Esperando a más jugadores…'));
   renderRules();lobbyFx();
 }
@@ -1433,7 +1454,7 @@ boardEl.addEventListener('pointerup',up);boardEl.addEventListener('pointercancel
 boardEl.addEventListener('contextmenu',e=>e.preventDefault());
 
 function wordState(w){if(w.length<G.min)return '';if(G.foundSet.has(w))return 'dup';return (look(w)&2)?'valid':''}
-function setWordHint(t){const cw=$('#curWord');cw.className='cur-word hint';cw.textContent=t}
+function setWordHint(t){const cw=$('#curWord');cw.className='cur-word hint';cw.textContent=t;cw.style.fontSize=''}
 function paint(){
   tiles.forEach((t,i)=>t.classList.toggle('sel',path.includes(i)));
   const w=pathWord(),st=wordState(w);
@@ -1444,6 +1465,7 @@ function paint(){
   if(!path.length){cw.className='cur-word hint';return}
   cw.append(document.createTextNode(w.toUpperCase()));
   if(w.length>=G.min)cw.append(el('span','len',st==='dup'?'YA':'+'+w.length));
+  fitText(cw,30,13);
 }
 function clearPath(){path=[];tiles.forEach(t=>t.classList.remove('sel'));boardEl.classList.remove('valid','dup');trailLine.setAttribute('points','')}
 const PRAISE={5:'¡Bien!',6:'¡Genial!',7:'¡Brutal!',8:'¡Bestial!',9:'¡Legendaria!'};
@@ -1465,13 +1487,13 @@ function submit(){
     scoreFly(w.length,big);
     if(w.length>=5){const p=el('div','praise',PRAISE[Math.min(w.length,9)]);$('.board-wrap').append(p);setTimeout(()=>p.remove(),1100);if(w.length>=7&&!REDUCE){boardEl.classList.remove('shake');void boardEl.offsetWidth;boardEl.classList.add('shake')}}
     const chip=el('span','chip new',w);chip.append(el('i',null,'+'+w.length));$('#foundStrip').prepend(chip);
-    cw.className='cur-word valid';cw.textContent=w.toUpperCase();
+    cw.className='cur-word valid';cw.textContent=w.toUpperCase();fitText(cw,30,13);
     clearPath();
     if(G.mode==='mp')setPresence({sc:G.score,n:G.found.length});
   }else{
     sfx.bad();vib([20,30,20]);
     cells.forEach(i=>{const t=tiles[i];t.classList.remove('no');void t.offsetWidth;t.classList.add('no');setTimeout(()=>t.classList.remove('no'),320)});
-    clearPath();cw.className='cur-word bad';cw.textContent=w.toUpperCase();
+    clearPath();cw.className='cur-word bad';cw.textContent=w.toUpperCase();fitText(cw,30,13);
   }
 }
 function renderOpps(){
@@ -1596,6 +1618,7 @@ function showResults(players){
     return{c,head,av,bar,sc,wd,spi:p.av.c,stage:0,tier:0,n:0,shown:0,anim:0};
   });
   body.append(stage,chart);
+  requestAnimationFrame(()=>chart.querySelectorAll('.bname').forEach(n=>fitText(n,15,9)));
 
   R={speed:1,timer:0,raf:0,dead:false,skip:false,phase:'reveal'};
   const me=R;
@@ -1606,12 +1629,12 @@ function showResults(players){
   const layoutBars=()=>{
     const mx=Math.max(...cols.map(c=>c.shown));scale=Math.max(40,Math.ceil(mx*1.18/25)*25);
     const cb=chart.getBoundingClientRect(),bb=cols[0].bar.getBoundingClientRect();if(bb.height)base=Math.round(cb.bottom-bb.bottom);
-    const H=Math.max(60,chart.clientHeight-base-36-50);
-    cols.forEach(cd=>{cd.bar.style.height=Math.max(36,cd.shown/scale*H+36)+'px'});
+    const H=Math.max(60,chart.clientHeight-base-50-50);
+    cols.forEach(cd=>{cd.bar.style.height=Math.max(50,cd.shown/scale*H+50)+'px'});
     // horizontal guide lines every 25 points (the evolution steps)
     const step=scale<=110?25:scale<=220?50:100;const lines=[];for(let v=step;v<scale;v+=step)lines.push(v);
     if(grid._k!==lines.join()){grid._k=lines.join();grid.replaceChildren(...lines.map(v=>{const l=el('div','bp-gl');l.dataset.v=v;const t=el('span',null,String(v));l.append(t);return l}))}
-    [...grid.children].forEach(l=>{l.style.bottom=(base+36+(+l.dataset.v)/scale*H)+'px'});
+    [...grid.children].forEach(l=>{l.style.bottom=(base+50+(+l.dataset.v)/scale*H)+'px'});
   };
   const evolve=(cd,stageN)=>{
     const from=crName(cd.spi,cd.stage);cd.stage=stageN;liveCr(cd.av,cd.spi,stageN,58);const to=crName(cd.spi,stageN);
@@ -1649,17 +1672,17 @@ function showResults(players){
     mts.forEach(t=>t.classList.remove('on'));line.setAttribute('points','');
     mb.classList.add('tracing');
     const col=it.f.length>1?'#ffffff':players[it.f[0]].col;mb.style.setProperty('--hc',it.f.length>1?'var(--t-yellow)':col);
-    pill.className='bp-pill';pill.style.setProperty('--pc',it.f.length>1?'var(--t-yellow)':col);pillT.textContent='';plus.textContent='';plus.className='bp-plus';sticker.className='bp-sticker';sticker.textContent='';
+    pill.className='bp-pill';pill.style.fontSize='';pill.style.setProperty('--pc',it.f.length>1?'var(--t-yellow)':col);pillT.textContent='';plus.textContent='';plus.className='bp-plus';sticker.className='bp-sticker';sticker.textContent='';
     finders.replaceChildren(...it.f.map(pi=>{const a=avCanvas(players[pi].av,30);a.style.setProperty('--pc',players[pi].col);return a}));
     setActive(it.f);
     const segK=it.shared?'rep':it.L;
-    if(segK!==lastSeg){const first=lastSeg===0;lastSeg=segK;segChip.textContent=it.shared?'Palabras repetidas':(order.some(o=>o.shared)?'Únicas de ':'Palabras de ')+it.L+' letras';
-      A(segChip,[{transform:'scale(.6) rotate(-6deg)',opacity:0},{transform:'scale(1.1) rotate(2deg)',opacity:1,offset:.6},{transform:'none',opacity:1}],{duration:420,easing:'ease-out'});
+    if(segK!==lastSeg){const first=lastSeg===0;lastSeg=segK;segChip.style.fontSize='';segChip.textContent=it.shared?'Palabras repetidas':(order.some(o=>o.shared)?'Únicas de ':'Palabras de ')+it.L+' letras';
+      fitText(segChip,15,10);A(segChip,[{transform:'scale(.6) rotate(-6deg)',opacity:0},{transform:'scale(1.1) rotate(2deg)',opacity:1,offset:.6},{transform:'none',opacity:1}],{duration:420,easing:'ease-out'});
       if(!me.skip&&(!first||it.shared)){callout(it.shared?'¡Primero, las repetidas!':'¡Únicas de '+it.L+' letras!');await wait(950)}}
     for(let k=0;k<path.length;k++){
       if(me.dead)return;
       const t=mts[path[k]];t.classList.add('on');
-      pillT.textContent+=tileStr(G.board[path[k]]).toUpperCase();
+      pillT.textContent+=tileStr(G.board[path[k]]).toUpperCase();fitText(pill,28,13);
       trail(path.slice(0,k+1));
       if(!me.skip){sfx.letter(k,0);A(t,[{transform:'scale(1)'},{transform:'scale(1.25)'},{transform:'scale(1.1)'}],{duration:180,easing:'ease-out'})}
       await wait(it.L>=7?120:100);
@@ -1679,7 +1702,7 @@ function showResults(players){
   };
 
   const run=async()=>{
-    pillT.textContent=order.length?order.length+(order.length===1?' palabra en juego':' palabras en juego'):'Nadie ha encontrado palabras';
+    pillT.textContent=order.length?order.length+(order.length===1?' palabra en juego':' palabras en juego'):'Nadie ha encontrado palabras';fitText(pill,24,13);
     await wait(1100);
     for(let i=0;i<order.length;i++){if(me.dead)return;await playWord(order[i],i);}
     if(me.dead)return;finale();
@@ -1907,6 +1930,7 @@ $('#btnGoHelp').onclick=()=>show('sHelp');
 buildBg();initSlabs();
 
 /* ================= MOTION 3.0: tactile feedback, juice and game-feel ================= */
+function fitText(node,maxPx,minPx){if(!node)return;node.style.fontSize='';const box=node.parentElement;const avail=(node.clientWidth&&node.scrollWidth>node.clientWidth)?node.clientWidth:null;let fs=maxPx||parseFloat(getComputedStyle(node).fontSize);node.style.fontSize=fs+'px';let guard=0;while(guard++<30&&fs>(minPx||12)&&(node.scrollWidth>node.clientWidth+1||(box&&box.scrollWidth>box.clientWidth+1&&getComputedStyle(box).overflowX!=='visible'))){fs-=1;node.style.fontSize=fs+'px'}}
 function A(node,kf,o){if(!node||!node.animate)return null;const K=window.__slow||1;return node.animate(kf,REDUCE?{...o,duration:1,delay:0}:{...o,duration:(o.duration||300)*K,delay:(o.delay||0)*K})}
 function centerOf(node){const r=node.getBoundingClientRect();return[r.left+r.width/2,r.top+r.height/2]}
 function sparks(x,y,cols,n,pow){if(REDUCE)return;FX.burst(x,y,cols||['#ffffff',CSSV('--t-yellow'),CSSV('--t-pink'),CSSV('--t-cyan')],n||18,pow||4.5)}
