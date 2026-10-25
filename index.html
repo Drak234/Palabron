@@ -957,10 +957,10 @@ body.foot-sm .screen.scroll{padding-bottom:96px}
       <div class="htxt"><b>Arrastra</b> por letras que se tocan, también en diagonal.<span class="hex">G → A → T → O = <i>GATO</i></span></div></div>
     <div class="hstep card"><span class="hn">2</span>
       <div class="hvis hpts"><span class="chip">sol<i>+3</i></span><span class="chip">gato<i>+4</i></span><span class="chip">caramelo<i>+8</i></span></div>
-      <div class="htxt"><b>1 punto por letra.</b> Las palabras largas valen mucho más.<span class="hex">Valen plurales y verbos: <i>cantaban, dímelo</i></span></div></div>
+      <div class="htxt"><b>1 punto por letra.</b> Las palabras largas valen mucho más.<span class="hex">Valen plurales y verbos: <i>cantaban, dímelo</i>. La ficha <i>Qu</i> vale 2.</span></div></div>
     <div class="hstep card"><span class="hn">3</span>
       <div class="hvis hevo"><canvas id="hEvo0"></canvas><b>→</b><canvas id="hEvo1"></canvas><b>→</b><canvas id="hEvo2"></canvas></div>
-      <div class="htxt">Tu criatura <b>evoluciona cada 25 puntos</b> y al final ¡combate!<span class="hex">En sala: si una palabra la encontráis varios, se marca como repetida.</span></div></div>
+      <div class="htxt">Tu criatura <b>evoluciona cada 25 puntos</b> y al final ¡combate!<span class="hex">En sala: «¡Única!» es una palabra que solo has encontrado tú; si la encontráis varios, es «repetida».</span></div></div>
     <button class="btn" id="helpOk" type="button">¡Entendido!</button>
   </section>
 
@@ -1240,7 +1240,7 @@ $('#saveProf').onclick=()=>{
 $('#editProf').onclick=openProfile;
 
 /* ================= BATTLE ================= */
-function battle(host,fs,final,skipNow){
+function battle(host,fs,final,skipNow,spd){spd=spd||(()=>1);
   return new Promise(done=>{
     const wrap=el('div','arena'),cv=el('canvas'),msg=el('div','arena-msg');msg.hidden=true;wrap.append(cv,msg);
     const cap=el('div','arena-cap',fs.length>1?(final?'Gran final: ':'')+fs[0].nick+' contra '+fs[1].nick+' · más puntos, más fuerza':'');
@@ -1275,7 +1275,7 @@ function battle(host,fs,final,skipNow){
       if(!B.dead&&wrap.isConnected)raf=requestAnimationFrame(draw);
     };
     raf=requestAnimationFrame(t=>{fit();draw(t)});
-    const tw=(ms,fn)=>new Promise(r=>{if(B.skip){fn(1);return r()}const t0=performance.now();const st=now=>{if(B.skip||!wrap.isConnected){fn(1);return r()}const kk=Math.min(1,(now-t0)/ms);fn(kk);if(kk<1)requestAnimationFrame(st);else r()};requestAnimationFrame(st)});
+    const tw=(ms,fn)=>new Promise(r=>{if(B.skip){fn(1);return r()}const t0=performance.now();const st=now=>{if(B.skip||!wrap.isConnected){fn(1);return r()}const kk=Math.min(1,(now-t0)*spd()/ms);fn(kk);if(kk<1)requestAnimationFrame(st);else r()};requestAnimationFrame(st)});
     const pause=ms=>tw(ms,()=>{});
     /* small lines go in the caption under the arena (never on top of the fighters); only the big shouts overlay it */
     const say=(txt,big)=>{if(big){msg.hidden=false;msg.className='arena-msg big';msg.textContent=txt;void msg.offsetWidth;msg.classList.add('in');clearTimeout(say.t);say.t=setTimeout(()=>msg.hidden=true,900)}
@@ -1846,7 +1846,7 @@ function showResults(players){
     // the two best creatures fight it out (solo: your creature shows off)
     const ranked=players.map((p,i)=>i).sort((x,y)=>totals[y]-totals[x]).slice(0,2).sort((x,y)=>(players[y].me?1:0)-(players[x].me?1:0));
     stage.classList.add('battling');
-    await battle(stage,ranked.map(i=>({nick:players[i].nick,spi:players[i].av.c,s:Math.min(cols[i].tier,MAXS),score:totals[i]})),players.length>2,skipped);
+    await battle(stage,ranked.map(i=>({nick:players[i].nick,spi:players[i].av.c,s:Math.min(cols[i].tier,MAXS),score:totals[i]})),players.length>2,skipped,()=>Math.max(1,me.speed/me.base));
     if(me.dead)return;
     if(topS>0&&(players.length>1||totals[0]>(G.prevBest||0)))win.forEach(i=>{cols[i].c.classList.add('win');const cr=crownSvg();cols[i].head.append(cr);
       const[x,y]=centerOf(cols[i].head);sparks(x,y,null,40,6);for(let k=0;k<3;k++)setTimeout(()=>FX.rocket(x+(k-1)*40,y,Math.max(40,y-160-k*40),['#fff',CSSV('--t-yellow'),CSSV('--t-pink')],40,4),200+k*220)});
