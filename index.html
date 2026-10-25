@@ -1231,7 +1231,7 @@ $('#saveProf').onclick=()=>{
 $('#editProf').onclick=openProfile;
 
 /* ================= BATTLE ================= */
-function battle(host,fs,final){
+function battle(host,fs,final,skipNow){
   return new Promise(done=>{
     const wrap=el('div','arena'),cv=el('canvas'),msg=el('div','arena-msg');msg.hidden=true;wrap.append(cv,msg);
     const cap=el('div','arena-cap',fs.length>1?(final?'Gran final: ':'')+fs[0].nick+' contra '+fs[1].nick+' · más puntos, más fuerza':'');
@@ -1239,7 +1239,7 @@ function battle(host,fs,final){
     host.replaceChildren(wrap,cap,skip);
     const ctx=cv.getContext('2d'),dpr=Math.min(2,window.devicePixelRatio||1);
     let W=320,H=220;const fit=()=>{W=cv.clientWidth||320;H=Math.round(W*11/16);cv.width=W*dpr;cv.height=H*dpr};fit();
-    const B={dead:false,skip:false,ps:[],proj:null,flash:0,shake:0};
+    const B={dead:false,skip:!!skipNow,ps:[],proj:null,flash:0,shake:0};
     const two=fs.length>1;
     const F=fs.map((f,i)=>({...f,hp:100,alpha:1,rot:0,dx:0,dy:0,blink:0,ko:false,px:two?(i===0?.28:.72):.5,py:two?(i===0?.66:.4):.6,sz:two?(i===0?.5:.42):.62,flip:two&&i===1}));
     const hps=F.map((f,i)=>{if(!two)return null;const h=el("div","hp "+(i===0?"hp-me":"hp-op"));const nm=el('div','nm');nm.append(el('span',null,f.nick),el('b',null,crName(f.spi,f.s)));const tr=el('div','tr'),fi=el('i');tr.append(fi);h.append(nm,tr);wrap.append(h);return{h,fi}});
@@ -1667,10 +1667,10 @@ function showResults(players){
   stopReveal();show('sResults');
   const dupRule=!!(G&&G.game&&G.game.dup);
   $('#resSub').textContent=(G&&G.mode==='mp'?'Sala '+roomCode:'Modo solo')+' · '+G.dur/60000+' min · '+G.min+'+ letras'+(dupRule?' · repetidas no puntúan':'');
-  players.sort((a,b)=>(b.me?1:0)-(a.me?1:0));
   /* colours follow a device-independent order, so everyone sees the same colour for the same player */
   const ck=p=>pkey(p)+'|'+p.words.length+'|'+[...p.words].sort().slice(0,3).join();
-  [...players].sort((a,b)=>ck(a)<ck(b)?-1:ck(a)>ck(b)?1:0).forEach((p,i)=>{p.col='var('+PCOL[i%PCOL.length]+')';p.colD='var('+PCOL[i%PCOL.length]+'-d)'});
+  /* same column order and colours on every phone; "TÚ" marks your own column */
+  players.sort((a,b)=>ck(a)<ck(b)?-1:ck(a)>ck(b)?1:0);players.forEach((p,i)=>{p.col='var('+PCOL[i%PCOL.length]+')';p.colD='var('+PCOL[i%PCOL.length]+'-d)'});
   const map=new Map();players.forEach((p,pi)=>p.words.forEach(w=>{if(!map.has(w))map.set(w,[]);map.get(w).push(pi)}));
   // order: 1) words found by more than one player, shortest first; 2) unique words by length, alternating between players
   const order=[],shownW=new Set();
@@ -1717,7 +1717,7 @@ function showResults(players){
     const c=el('div','bcol');c.style.setProperty('--pc',p.col);c.style.setProperty('--pcd',p.colD);
     const head=el('div','bhead'),av=el('canvas','bav');head.append(av);
     const bar=el('div','bbar'),sc=el('span','bsc','0');bar.append(sc);
-    const nm=el('div','bname',p.nick),wd=el('div','bwords','0 palabras');
+    const nm=el('div','bname',p.me&&players.length>1?p.nick+' (tú)':p.nick),wd=el('div','bwords','0 palabras');
     c.append(head,bar,nm,wd);chart.append(c);
     liveCr(av,p.av.c,0,58);
     return{c,head,av,bar,sc,wd,spi:p.av.c,stage:0,tier:0,n:0,shown:0,anim:0};
@@ -1778,7 +1778,7 @@ function showResults(players){
   requestAnimationFrame(()=>{measure();layoutBars()});addEventListener('resize',onRs);
 
   const playWord=async(it,idx)=>{
-    const path=(it.f.includes(0)&&players[0].me&&G.paths&&G.paths[it.w])||findPath(G.board,it.w)||[];
+    const mi=players.findIndex(p=>p.me);const path=(mi>=0&&it.f.includes(mi)&&G.paths&&G.paths[it.w])||findPath(G.board,it.w)||[];
     mts.forEach(t=>t.classList.remove('on'));line.setAttribute('points','');
     mb.classList.add('tracing');
     const col=it.f.length>1?'#ffffff':players[it.f[0]].col;mb.style.setProperty('--hc',it.f.length>1?'var(--t-yellow)':col);
@@ -1821,7 +1821,7 @@ function showResults(players){
     if(me.dead)return;finale();
   };
   const finale=async()=>{
-    if(me.dead||me.phase==='done')return;me.phase='done';me.skip=true;
+    if(me.dead||me.phase==='done')return;me.phase='done';const skipped=me.skip;me.skip=true;
     cols.forEach((cd,i)=>{cancelAnimationFrame(cd.anim);live[i]=totals[i];setVal(cd,totals[i]);cd.wd.textContent=counts[i]+(counts[i]===1?' palabra':' palabras')});layoutBars();
     setActive(null);mFill.style.height='100%';mDone.lastChild.textContent=String(order.length);
     const topS=Math.max(...totals);const win=totals.map((t,i)=>t===topS?i:-1).filter(i=>i>=0);
@@ -1833,7 +1833,7 @@ function showResults(players){
     // the two best creatures fight it out (solo: your creature shows off)
     const ranked=players.map((p,i)=>i).sort((x,y)=>totals[y]-totals[x]).slice(0,2).sort((x,y)=>(players[y].me?1:0)-(players[x].me?1:0));
     stage.classList.add('battling');
-    await battle(stage,ranked.map(i=>({nick:players[i].nick,spi:players[i].av.c,s:Math.min(cols[i].tier,MAXS),score:totals[i]})),players.length>2);
+    await battle(stage,ranked.map(i=>({nick:players[i].nick,spi:players[i].av.c,s:Math.min(cols[i].tier,MAXS),score:totals[i]})),players.length>2,skipped);
     if(me.dead)return;
     if(topS>0&&(players.length>1||totals[0]>(G.prevBest||0)))win.forEach(i=>{cols[i].c.classList.add('win');const cr=crownSvg();cols[i].head.append(cr);
       const[x,y]=centerOf(cols[i].head);sparks(x,y,null,40,6);for(let k=0;k<3;k++)setTimeout(()=>FX.rocket(x+(k-1)*40,y,Math.max(40,y-160-k*40),['#fff',CSSV('--t-yellow'),CSSV('--t-pink')],40,4),200+k*220)});
