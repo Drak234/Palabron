@@ -850,6 +850,7 @@ h2,.scr-title{font-size:clamp(27px,8.4vw,34px)}
 .opp{border-color:var(--pc,var(--ink))}
 .solo-pick{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .solo-pick .zen{grid-column:1/-1}
+.cr-pick span{text-overflow:clip}
 .res-acts{display:flex;flex-direction:column;gap:10px}
 .res-acts .btn.small{align-self:center}
 .cbox a.btn{text-decoration:none;justify-content:center}
@@ -1213,7 +1214,7 @@ function openProfile(){
 function renderProfile(){
   const grid=$('#crGrid');grid.replaceChildren();
   SPECIES.forEach((p,i)=>{const b=el('button','cr-pick');b.type='button';b.setAttribute('aria-label',p.n[0]+', '+EL[p.el]);
-    const cv=el('canvas');cv.style.width='100%';drawCr(cv,i,0,60,0,p.bg);b.append(cv,el('span',null,p.n[0]));
+    const cv=el('canvas');cv.style.width='100%';drawCr(cv,i,0,60,0,p.bg);const nm=el('span',null,p.n[0]);b.append(cv,nm);setTimeout(()=>fitText(nm,11,7),450);
     b.onclick=()=>{if(draft.av.c===i)return;draft.av.c=i;sfx.join();paintHero(true);
       if(profile){profile={...profile,av:cleanAv(draft.av),v:3};store.set('profile',profile);if(named)named.presence({av:profile.av}).catch(()=>{});renderMenu()}};grid.append(b)});
   paintHero(false);
@@ -1245,7 +1246,7 @@ function battle(host,fs,final,skipNow,spd){spd=spd||(()=>1);
     const wrap=el('div','arena'),cv=el('canvas'),msg=el('div','arena-msg');msg.hidden=true;wrap.append(cv,msg);
     const cap=el('div','arena-cap',fs.length>1?(final?'Gran final: ':'')+fs[0].nick+' contra '+fs[1].nick+' · más puntos, más fuerza':'');
     const skip=el('button','btn ghost small','Saltar combate');skip.type='button';
-    host.replaceChildren(wrap,cap,skip);
+    host.replaceChildren(wrap,cap);if(fs.length>1)host.append(skip);
     const ctx=cv.getContext('2d'),dpr=Math.min(2,window.devicePixelRatio||1);
     let W=320,H=220;const fit=()=>{W=cv.clientWidth||320;H=Math.round(W*11/16);cv.width=W*dpr;cv.height=H*dpr};fit();
     const B={dead:false,skip:!!skipNow,ps:[],proj:null,flash:0,shake:0};
@@ -1839,7 +1840,7 @@ function showResults(players){
     setActive(null);mFill.style.height='100%';mDone.lastChild.textContent=String(order.length);
     const topS=Math.max(...totals);const win=totals.map((t,i)=>t===topS?i:-1).filter(i=>i>=0);
     let msg;
-    if(players.length===1)msg=totals[0]>(G.prevBest||0)?'¡Nuevo récord!':totals[0]+' puntos · tu récord: '+(G.prevBest||0);
+    if(players.length===1)msg=!G.prevBest?'¡Primera partida: '+totals[0]+' puntos!':totals[0]>G.prevBest?'¡Nuevo récord!':totals[0]+' puntos · tu récord: '+G.prevBest;
     else if(win.length>1)msg='¡Empate!';
     else msg=players[win[0]].me?'¡Has ganado!':'¡Gana '+players[win[0]].nick+'!';
     cols.forEach(cd=>{const b=cd.head.querySelector('.lead-badge');if(b)b.remove()});
@@ -1864,11 +1865,11 @@ function showResults(players){
       d.append(l);body.append(d);
     });
     /* "longest missed" favours everyday words over enclitic chains and rare tenses */
-    const RARE=/(?:(?:ar|er|ir|ndo|ad|ed|id)(?:me|te|se|nos|os)?(?:lo|la|le|los|las|les)|(?:ar|er|ir|ndo)(?:me|te|se|nos|os)|(?:me|te|se|nos)(?:lo|la|los|las)|aseis|ieseis|arais|ierais|areis|iereis|asteis|isteis|asemos|iesemos|ieremos|isim[oa]s?|ase|ases|asen|iese|ieses|iesen|iere|ieres|ieren)$/;
+    const RARE=/(?:(?:ar|er|ir|ndo|ad|ed|id)(?:me|te|se|nos|os)?(?:lo|la|le|los|las|les)|(?:ar|er|ir|ndo)(?:me|te|se|nos|os)|(?:me|te|se|nos)(?:lo|la|los|las)|aseis|ieseis|arais|ierais|areis|iereis|asteis|isteis|asemos|iesemos|ieremos|isim[oa]s?|[ce]it[oa]s?|ase|ases|asen|iese|ieses|iesen|iere|ieres|ieren)$/;
     const VULG=/^(?:put[ao]|mierd|coñ|poll(?:a|as|on)$|jod|cabron|gilipoll|foll|mea(?:d[ao]s?|r|n|s)?$|mead|culos?$|verg[ao]|choch|cojon|maric|zorr[ao]s?$|penes?$|tetas?$|cacas?$|pedos?$|pis$|cagu|cag[aeo])/;
     const missed=G.sol.filter(w=>!map.has(w)&&!VULG.test(w)).map(w=>[w,RARE.test(w)?1:0]).sort((a,b)=>a[1]-b[1]||b[0].length-a[0].length||a[0].localeCompare(b[0],'es')).slice(0,16).map(x=>x[0]);
     const m=el('div','card stack');m.style.gap='8px';
-    m.append(el('div','lbl',(players.length>1?'Encontrasteis ':'Encontraste ')+map.size+' de '+G.sol.length+' palabras posibles'));
+    m.append(el('div','lbl',(players.length>1?'Entre todos encontrasteis ':'Encontraste ')+map.size+(map.size===1?' palabra':' palabras')),el('div','muted','Este tablero escondía '+G.sol.length+'. ¡Nadie las encuentra todas!'));
     if(missed.length){m.append(el('div','muted','Las más largas que se escaparon:'));const l=el('div','res-words');
       for(const w of missed){const r=el('button','rw',accent(w));r.type='button';r.append(el('b',null,'+'+w.length));r.onclick=()=>wordInfo(w,'Nadie la encontró');l.append(r)}m.append(l)}
     body.append(m);
