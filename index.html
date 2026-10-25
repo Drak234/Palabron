@@ -1522,7 +1522,7 @@ async function beginRound({board,mode,game,soloT}){
   $('#hScore').textContent='0';$('#hCount').textContent='0';$('#hTime').textContent=zen?'∞':fmt(gr.t);$('#btnQuit').textContent=zen?'Terminar':'Abandonar';$('#hBar').style.transform='scaleX(1)';
   $('#hud').classList.remove('urgent','warn');$('#foundStrip').replaceChildren();$('#flyLayer').replaceChildren();
   setWordHint('PREPÁRATE');
-  $('#playMode').textContent=(mode==='mp'?'Sala '+roomCode:'Modo solo')+' · '+(zen?'sin reloj':gr.t/60+' min')+' · '+gr.min+'+ letras';
+  $('#playMode').textContent=(mode==='mp'?'Sala '+roomCode:'Modo solo')+' · '+(zen?'sin reloj':gr.t/60+' min')+' · '+gr.min+'+ letras'+(mode==='mp'&&gr.dup?' · repetidas 0':'');
   buildTiles(board,true);renderOpps();show('sPlay');
   if(mode==='mp')setPresence({st:'playing',gid:game.id,sc:0,n:0,words:null});
   const ov=$('#overlay');ov.hidden=false;
