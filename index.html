@@ -1258,7 +1258,7 @@ $('#editProf').onclick=openProfile;
 function battle(host,fs,final,skipNow,spd){spd=spd||(()=>1);
   return new Promise(done=>{
     const wrap=el('div','arena'),cv=el('canvas'),msg=el('div','arena-msg');msg.hidden=true;wrap.append(cv,msg);
-    const cap=el('div','arena-cap',fs.length>1?(final?'Gran final: ':'')+fs[0].nick+' contra '+fs[1].nick+' · más puntos, más fuerza':'');
+    const cap=el('div','arena-cap',fs.length>1?(final?'Gran final: ':'')+fs[0].nick+' contra '+fs[1].nick+(typeof final==='string'?final:' · más puntos, más fuerza'):'');
     const skip=el('button','btn ghost small','Saltar combate');skip.type='button';
     host.replaceChildren(wrap,cap);if(fs.length>1)host.append(skip);
     const ctx=cv.getContext('2d'),dpr=Math.min(2,window.devicePixelRatio||1);
@@ -1874,9 +1874,11 @@ function showResults(players){
     else{const sec=Math.max(...totals.filter((t,i)=>i!==win[0])),by=topS-sec;msg=(players[win[0]].me?'¡Has ganado':'¡Gana '+players[win[0]].nick)+(by<=3?' por '+by+(by===1?' punto!':' puntos!'):'!')}
     cols.forEach(cd=>{const b=cd.head.querySelector('.lead-badge');if(b)b.remove()});
     // the two best creatures fight it out (solo: your creature shows off)
-    const ranked=players.map((p,i)=>i).sort((x,y)=>totals[y]-totals[x]).slice(0,2).sort((x,y)=>(players[y].me?1:0)-(players[x].me?1:0));
+    const byScore=players.map((p,i)=>i).sort((x,y)=>totals[y]-totals[x]||counts[y]-counts[x]);
+    const tieNote=players.length>2&&totals[byScore[1]]===totals[byScore[2]]?' (empate a '+totals[byScore[1]]+': pasa '+players[byScore[1]].nick+' por más palabras)':'';
+    const ranked=byScore.slice(0,2).sort((x,y)=>(players[y].me?1:0)-(players[x].me?1:0));
     stage.classList.add('battling');
-    await battle(stage,ranked.map(i=>({nick:players[i].nick,spi:players[i].av.c,s:Math.min(cols[i].tier,MAXS),score:totals[i]})),players.length>2,skipped,()=>Math.max(1,me.speed/me.base));
+    await battle(stage,ranked.map(i=>({nick:players[i].nick,spi:players[i].av.c,s:Math.min(cols[i].tier,MAXS),score:totals[i]})),players.length>2?(tieNote||true):false,skipped,()=>Math.max(1,me.speed/me.base));
     if(me.dead)return;
     if(topS>0&&(players.length>1||totals[0]>(G.prevBest||0)))win.forEach(i=>{cols[i].c.classList.add('win');const cr=crownSvg();cols[i].head.append(cr);
       const[x,y]=centerOf(cols[i].head);sparks(x,y,null,40,6);for(let k=0;k<3;k++)setTimeout(()=>FX.rocket(x+(k-1)*40,y,Math.max(40,y-160-k*40),['#fff',CSSV('--t-yellow'),CSSV('--t-pink')],40,4),200+k*220)});
