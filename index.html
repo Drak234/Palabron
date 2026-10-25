@@ -848,6 +848,8 @@ h2,.scr-title{font-size:clamp(27px,8.4vw,34px)}
 .pl{border-left:8px solid var(--pc,var(--ink))}
 .pl .av,.opp .av{box-shadow:0 0 0 3px var(--pc,transparent)}
 .opp{border-color:var(--pc,var(--ink))}
+.solo-pick{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.solo-pick .zen{grid-column:1/-1}
 .res-acts{display:flex;flex-direction:column;gap:10px}
 .res-acts .btn.small{align-self:center}
 .cbox a.btn{text-decoration:none;justify-content:center}
@@ -1486,16 +1488,17 @@ function buildTiles(board,faceDown){
     boardEl.append(t);tiles.push(t)});
 }
 function fmt(s){return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')}
-async function beginRound({board,mode,game}){
+async function beginRound({board,mode,game,soloT}){
   if(!DICT.length){const ov=$('#overlay');ov.hidden=false;ov.replaceChildren(el('div','big small','Cargando…'));try{await dictP}catch(e){ov.hidden=true;return}ov.hidden=true}
   clearTimeout(waitTimer);waitState=null;stopReveal();
-  const gr=game?cleanRules({t:game.dur,min:game.min,dup:game.dup}):rules;
-  G={board,mode,dur:gr.t*1000,min:gr.min,game:game||{id:'solo',t:Date.now(),dup:false,dur:gr.t,min:gr.min},sol:null,found:[],foundSet:new Set(),paths:{},score:0,live:false,over:false,endAt:0,lastS:-1};
+  const gr=game?cleanRules({t:game.dur,min:game.min,dup:game.dup}):{...rules,t:soloT==null?rules.t:soloT};
+  const zen=!game&&gr.t===0;
+  G={board,mode,zen,soloT:game?null:gr.t,dur:gr.t*1000,min:gr.min,game:game||{id:'solo',t:Date.now(),dup:false,dur:gr.t,min:gr.min},sol:null,found:[],foundSet:new Set(),paths:{},score:0,live:false,over:false,endAt:0,lastS:-1};
   G.sol=solve(board).filter(w=>w.length>=G.min);
-  $('#hScore').textContent='0';$('#hCount').textContent='0';$('#hTime').textContent=fmt(gr.t);$('#hBar').style.transform='scaleX(1)';
+  $('#hScore').textContent='0';$('#hCount').textContent='0';$('#hTime').textContent=zen?'∞':fmt(gr.t);$('#btnQuit').textContent=zen?'Terminar':'Abandonar';$('#hBar').style.transform='scaleX(1)';
   $('#hud').classList.remove('urgent','warn');$('#foundStrip').replaceChildren();$('#flyLayer').replaceChildren();
   setWordHint('PREPÁRATE');
-  $('#playMode').textContent=(mode==='mp'?'Sala '+roomCode:'Modo solo')+' · '+gr.t/60+' min · '+gr.min+'+ letras';
+  $('#playMode').textContent=(mode==='mp'?'Sala '+roomCode:'Modo solo')+' · '+(zen?'sin reloj':gr.t/60+' min')+' · '+gr.min+'+ letras';
   buildTiles(board,true);renderOpps();show('sPlay');
   if(mode==='mp')setPresence({st:'playing',gid:game.id,sc:0,n:0,words:null});
   const ov=$('#overlay');ov.hidden=false;
@@ -1512,7 +1515,7 @@ async function beginRound({board,mode,game}){
   requestAnimationFrame(loop);
 }
 function loop(){
-  if(!G||!G.live)return;
+  if(!G||!G.live||G.zen)return;
   const left=Math.max(0,G.endAt-performance.now()),s=Math.ceil(left/1000);
   $('#hBar').style.transform='scaleX('+(left/G.dur)+')';
   if(s!==G.lastS){G.lastS=s;$('#hTime').textContent=fmt(s);const h=$('#hud');h.classList.toggle('warn',s<=30&&s>10);if(s<=10&&s>0){h.classList.add('urgent');sfx.urgent();heartbeat()}}
@@ -1613,7 +1616,7 @@ async function endRound(){
   if(G.mode==='mp'){startWaiting()}else{showResults([{nick:profile.nick,av:profile.av,words:G.found,me:true}])}
 }
 $('#btnQuit').onclick=()=>{
-  if(!G)return;G.live=false;G.over=true;$('#overlay').hidden=true;
+  if(!G)return;if(G.zen&&G.live){endRound();return}G.live=false;G.over=true;$('#overlay').hidden=true;
   if(G.mode==='mp'){setPresence({st:'lobby',gid:null,words:null});renderLobby();show('sLobby')}else{renderMenu();show('sMenu')}
   G=null;
 };
@@ -1666,7 +1669,7 @@ function findPath(b,w){
 function showResults(players){
   stopReveal();show('sResults');
   const dupRule=!!(G&&G.game&&G.game.dup);
-  $('#resSub').textContent=(G&&G.mode==='mp'?'Sala '+roomCode:'Modo solo')+' · '+G.dur/60000+' min · '+G.min+'+ letras'+(dupRule?' · repetidas no puntúan':'');
+  $('#resSub').textContent=(G&&G.mode==='mp'?'Sala '+roomCode:'Modo solo')+' · '+(G.zen?'sin reloj':G.dur/60000+' min')+' · '+G.min+'+ letras'+(dupRule?' · repetidas no puntúan':'');
   /* colours follow a device-independent order, so everyone sees the same colour for the same player */
   const ck=p=>pkey(p)+'|'+p.words.length+'|'+[...p.words].sort().slice(0,3).join();
   /* same column order and colours on every phone; "TÚ" marks your own column */
@@ -1859,7 +1862,7 @@ function showResults(players){
       for(const w of missed){const r=el('button','rw',accent(w));r.type='button';r.append(el('b',null,'+'+w.length));r.onclick=()=>wordInfo(w,'Nadie la encontró');l.append(r)}m.append(l)}
     body.append(m);
     const again=el('button','btn',G.mode==='mp'?'Revancha':'Otra partida');again.type='button';
-    again.onclick=()=>{if(G.mode==='mp')startMpGame();else beginRound({board:genBoard(),mode:'solo'})};
+    again.onclick=()=>{if(G.mode==='mp')startMpGame();else beginRound({board:genBoard(),mode:'solo',soloT:G.soloT})};
     if(G.mode==='mp'&&!amHost()){again.disabled=true;again.textContent='Esperando al anfitrión…'}
     const back=el('button','btn ghost',G.mode==='mp'?'Volver a la sala':'Menú');back.type='button';
     back.onclick=()=>{stopReveal();if(G&&G.mode==='mp'){setPresence({st:'lobby',gid:null,words:null});renderLobby();show('sLobby')}else{renderMenu();show('sMenu')}};
@@ -2180,7 +2183,15 @@ function dropTiles(){
 }
 
 /* ================= WIRING ================= */
-$('#btnSolo').onclick=()=>{ac();beginRound({board:genBoard(),mode:'solo'})};
+/* solo: pick the time (or no clock at all) — remembered for next time */
+$('#btnSolo').onclick=()=>{ac();
+  const v=el('div','cbox-veil'),b=el('div','cbox card');b.setAttribute('role','dialog');b.append(el('div','cbox-t','¿Cuánto tiempo?'));
+  const last=store.get('soloT',rules.t);const g=el('div','solo-pick');
+  [[60,'1 min'],[120,'2 min'],[180,'3 min'],[0,'Sin reloj']].forEach(([t,l])=>{const x=el('button','btn'+(t===last?'':' ghost')+(t===0?' zen':''),l);x.type='button';
+    x.onclick=()=>{store.set('soloT',t);v.remove();beginRound({board:genBoard(),mode:'solo',soloT:t})};g.append(x)});
+  b.append(g,el('p','cbox-m','Sin reloj: juega con calma y pulsa «Terminar» cuando quieras.'));v.append(b);document.body.append(v);
+  v.onclick=e=>{if(e.target===v)v.remove()};
+  A(b,[{transform:'scale(.7)',opacity:0},{transform:'scale(1.04)',opacity:1,offset:.6},{transform:'none',opacity:1}],{duration:320,easing:'ease-out'})};
 $('#btnCreate').onclick=()=>{ac();const A='ABCDEFGHJKLMNPRSTUVWXYZ';let c='';for(let i=0;i<4;i++)c+=A[Math.floor(Math.random()*A.length)];enterRoom(c,true)};
 $('#btnJoin').onclick=async()=>{ac();await enterRoom($('#codeIn').value);if(screen==='sJoin')shakeCode()};
 $('#codeIn').addEventListener('input',e=>{e.target.value=e.target.value.toUpperCase().replace(/[^A-Z]/g,'').slice(0,4)},true);
