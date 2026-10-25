@@ -762,7 +762,7 @@ h2,.scr-title{font-size:clamp(27px,8.4vw,34px)}
 .bp-mid{display:flex;align-items:stretch;justify-content:center;gap:12px;width:100%}
 .bp-board{--mw:min(calc(100vw - 150px),27vh,250px)}
 .bp-board .mt{opacity:1}
-.mboard.tracing .mt:not(.on){opacity:.42}
+.mboard.tracing .mt:not(.on){opacity:.62}
 .bp-meter{display:flex;flex-direction:column;align-items:center;gap:4px;width:58px}
 .bp-mlab{display:flex;flex-direction:column;align-items:center;line-height:1}
 .bp-mlab span{font-family:var(--f-body);font-weight:900;font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--plum-2)}
@@ -802,7 +802,7 @@ h2,.scr-title{font-size:clamp(27px,8.4vw,34px)}
 .bwords{font-family:var(--f-body);font-weight:900;font-size:11px;color:#fff;text-shadow:0 1px 0 var(--ink),0 0 4px var(--ink);margin-top:3px}
 .bplus{position:absolute;left:50%;top:-34px;z-index:4;translate:-50% 0;font-family:var(--f-display);font-size:24px;color:var(--t-lime);-webkit-text-stroke:5px var(--ink);paint-order:stroke fill;pointer-events:none;animation:bplus 1s ease-out forwards}
 @keyframes bplus{0%{opacity:0;transform:translateY(14px) scale(.4)}25%{opacity:1;transform:translateY(-4px) scale(1.25)}60%{opacity:1;transform:translateY(-10px) scale(1)}100%{opacity:0;transform:translateY(-26px) scale(1)}}
-.bevo{position:absolute;left:50%;top:-48px;z-index:5;translate:-50% 0;white-space:nowrap;font-family:var(--f-display);font-size:16px;color:#fff;background:var(--purple);border:2.5px solid var(--ink);border-radius:10px;padding:2px 9px 3px;box-shadow:0 3px 0 var(--ink);-webkit-text-stroke:3px var(--ink);paint-order:stroke fill;animation:bevo 1.5s var(--e-pop) forwards}
+.bevo{position:absolute;left:50%;top:-74px;z-index:5;translate:-50% 0;white-space:nowrap;font-family:var(--f-display);font-size:16px;color:#fff;background:var(--purple);border:2.5px solid var(--ink);border-radius:10px;padding:2px 9px 3px;box-shadow:0 3px 0 var(--ink);-webkit-text-stroke:3px var(--ink);paint-order:stroke fill;animation:bevo 1.5s var(--e-pop) forwards}
 @keyframes bevo{0%{opacity:0;transform:scale(.3) rotate(-10deg)}20%{opacity:1;transform:scale(1.1) rotate(-4deg)}80%{opacity:1;transform:scale(1) rotate(-4deg)}100%{opacity:0;transform:translateY(-12px) rotate(-4deg)}}
 .bcol.win{transform:translateY(-8px)}
 .bcol.win .bbar{box-shadow:inset 0 4px 0 rgba(255,255,255,.45),0 0 0 3px var(--t-yellow),0 0 28px var(--t-yellow)}
@@ -1640,7 +1640,7 @@ function renderOpps(){
   const box=$('#opps');box.replaceChildren();
   if(!G||G.mode!=='mp')return;
   for(const p of peers){if(p.sameTab)continue;const pr=p.presence||{};if(pr.gid!==G.game.id)continue;
-    const o=el('div','opp');o.style.setProperty('--pc',pcol(peers.map(q=>({nick:q.sameTab?profile.nick:cleanNick((q.presence||{}).nick),av:q.sameTab?profile.av:cleanAv((q.presence||{}).av)})),{nick:cleanNick(pr.nick),av:cleanAv(pr.av)}));o.append(avCanvas(cleanAv(pr.av),26),document.createTextNode(cleanNick(pr.nick)));o.append(el('span','c',(Number.isInteger(pr.n)?pr.n:0)+' pal.'));box.append(o)}
+    const o=el('div','opp');o.style.setProperty('--pc',pcol(peers.map(q=>({nick:q.sameTab?profile.nick:cleanNick((q.presence||{}).nick),av:q.sameTab?profile.av:cleanAv((q.presence||{}).av)})),{nick:cleanNick(pr.nick),av:cleanAv(pr.av)}));o.append(avCanvas(cleanAv(pr.av),26),document.createTextNode(cleanNick(pr.nick)));o.append(el('span','c',(Number.isInteger(pr.sc)?pr.sc:0)+' pts'));box.append(o)}
 }
 async function endRound(){
   if(!G||G.over)return;
@@ -1871,7 +1871,7 @@ function showResults(players){
     let msg;
     if(players.length===1)msg=!G.prevBest?'¡Primera partida: '+totals[0]+' puntos!':totals[0]>G.prevBest?'¡Nuevo récord!':totals[0]+' puntos · tu récord: '+G.prevBest;
     else if(win.length>1)msg='¡Empate!';
-    else msg=players[win[0]].me?'¡Has ganado!':'¡Gana '+players[win[0]].nick+'!';
+    else{const sec=Math.max(...totals.filter((t,i)=>i!==win[0])),by=topS-sec;msg=(players[win[0]].me?'¡Has ganado':'¡Gana '+players[win[0]].nick)+(by<=3?' por '+by+(by===1?' punto!':' puntos!'):'!')}
     cols.forEach(cd=>{const b=cd.head.querySelector('.lead-badge');if(b)b.remove()});
     // the two best creatures fight it out (solo: your creature shows off)
     const ranked=players.map((p,i)=>i).sort((x,y)=>totals[y]-totals[x]).slice(0,2).sort((x,y)=>(players[y].me?1:0)-(players[x].me?1:0));
