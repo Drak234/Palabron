@@ -864,6 +864,12 @@ h2,.scr-title{font-size:clamp(27px,8.4vw,34px)}
 #sPlay .play-foot{margin-top:2px}
 @media (max-height:700px){#sPlay .word-wrap{margin-top:0}#sPlay .play-foot{margin-top:auto}}
 body.res-scrolled #muteBtn{opacity:0;pointer-events:none;transition:opacity .2s}
+
+/* tablets and desktop: use the extra room */
+@media (min-width:700px) and (min-height:760px){
+  .screen{max-width:620px}
+  :root{--bw:min(calc(100vw - 32px),calc(100dvh - 330px),580px)}
+}
 /* ---------- footer v2: hint on top, Volver + main action in one row ---------- */
 #uiFoot{display:flex;flex-direction:column;gap:8px}
 #footRow{display:flex;align-items:center;gap:10px;pointer-events:auto}
@@ -1208,7 +1214,8 @@ function renderProfile(){
   const grid=$('#crGrid');grid.replaceChildren();
   SPECIES.forEach((p,i)=>{const b=el('button','cr-pick');b.type='button';b.setAttribute('aria-label',p.n[0]+', '+EL[p.el]);
     const cv=el('canvas');cv.style.width='100%';drawCr(cv,i,0,60,0,p.bg);b.append(cv,el('span',null,p.n[0]));
-    b.onclick=()=>{if(draft.av.c===i)return;draft.av.c=i;sfx.join();paintHero(true)};grid.append(b)});
+    b.onclick=()=>{if(draft.av.c===i)return;draft.av.c=i;sfx.join();paintHero(true);
+      if(profile){profile={...profile,av:cleanAv(draft.av),v:3};store.set('profile',profile);if(named)named.presence({av:profile.av}).catch(()=>{});renderMenu()}};grid.append(b)});
   paintHero(false);
 }
 function paintHero(anim){
@@ -1444,7 +1451,9 @@ function renderLobby(){
   if(list.length<2)pl.append(el('div','muted','Esperando a más jugadores…'));
   renderRules();lobbyFx();
 }
+let rematchSeen=new Map();
 function onRoomChange(){
+  if(amHost())for(const p of peers){const r=p.presence&&p.presence.rematch;if(!p.sameTab&&r&&rematchSeen.get(p.peer)!==r){const first=rematchSeen.has(p.peer)||Date.now()-r<20000;rematchSeen.set(p.peer,r);if(first){toast(cleanNick(p.presence.nick)+' quiere la revancha',3000);sfx.join();vib([30,40,30])}}}
   if(screen==='sLobby')renderLobby();
   if(screen==='sPlay')renderOpps();
   checkIncomingGame();
@@ -1793,7 +1802,8 @@ function showResults(players){
     if(segK!==lastSeg){const first=lastSeg===0;lastSeg=segK;segChip.style.fontSize='';segChip.textContent=it.shared?'Palabras repetidas':(order.some(o=>o.shared)?'Únicas de ':'Palabras de ')+it.L+' letras';
       fitText(segChip,15,10);A(segChip,[{transform:'scale(.6) rotate(-6deg)',opacity:0},{transform:'scale(1.1) rotate(2deg)',opacity:1,offset:.6},{transform:'none',opacity:1}],{duration:420,easing:'ease-out'});
       if(!me.skip&&(!first||it.shared)){callout(it.shared?'¡Primero, las repetidas!':(order.some(o=>o.shared)?'¡Únicas de ':'¡Palabras de ')+it.L+' letras!');await wait(950)}}
-    for(let k=0;k<path.length;k++){
+    if(REDUCE){path.forEach(i=>mts[i].classList.add('on'));pillT.textContent=it.w.toUpperCase();fitText(pill,28,13);trail(path);await wait(250)}
+    else for(let k=0;k<path.length;k++){
       if(me.dead)return;
       const t=mts[path[k]];t.classList.add('on');
       pillT.textContent+=tileStr(G.board[path[k]]).toUpperCase();fitText(pill,28,13);
@@ -1855,7 +1865,8 @@ function showResults(players){
     });
     /* "longest missed" favours everyday words over enclitic chains and rare tenses */
     const RARE=/(?:(?:ar|er|ir|ndo|ad|ed|id)(?:me|te|se|nos|os)?(?:lo|la|le|los|las|les)|(?:ar|er|ir|ndo)(?:me|te|se|nos|os)|(?:me|te|se|nos)(?:lo|la|los|las)|aseis|ieseis|arais|ierais|areis|iereis|asteis|isteis|asemos|iesemos|ieremos|isim[oa]s?|ase|ases|asen|iese|ieses|iesen|iere|ieres|ieren)$/;
-    const missed=G.sol.filter(w=>!map.has(w)).map(w=>[w,RARE.test(w)?1:0]).sort((a,b)=>a[1]-b[1]||b[0].length-a[0].length||a[0].localeCompare(b[0],'es')).slice(0,16).map(x=>x[0]);
+    const VULG=/^(?:put[ao]|mierd|coñ|poll(?:a|as|on)$|jod|cabron|gilipoll|foll|mea(?:d[ao]s?|r|n|s)?$|mead|culos?$|verg[ao]|choch|cojon|maric|zorr[ao]s?$|penes?$|tetas?$|cacas?$|pedos?$|pis$|cagu|cag[aeo])/;
+    const missed=G.sol.filter(w=>!map.has(w)&&!VULG.test(w)).map(w=>[w,RARE.test(w)?1:0]).sort((a,b)=>a[1]-b[1]||b[0].length-a[0].length||a[0].localeCompare(b[0],'es')).slice(0,16).map(x=>x[0]);
     const m=el('div','card stack');m.style.gap='8px';
     m.append(el('div','lbl',(players.length>1?'Encontrasteis ':'Encontraste ')+map.size+' de '+G.sol.length+' palabras posibles'));
     if(missed.length){m.append(el('div','muted','Las más largas que se escaparon:'));const l=el('div','res-words');
@@ -1863,7 +1874,7 @@ function showResults(players){
     body.append(m);
     const again=el('button','btn',G.mode==='mp'?'Revancha':'Otra partida');again.type='button';
     again.onclick=()=>{if(G.mode==='mp')startMpGame();else beginRound({board:genBoard(),mode:'solo',soloT:G.soloT})};
-    if(G.mode==='mp'&&!amHost()){again.disabled=true;again.textContent='Esperando al anfitrión…'}
+    if(G.mode==='mp'&&!amHost()){again.textContent='Pedir revancha';again.onclick=()=>{setPresence({rematch:Date.now()});again.disabled=true;again.textContent='Revancha pedida · esperando al anfitrión…';sfx.coin()}}
     const back=el('button','btn ghost',G.mode==='mp'?'Volver a la sala':'Menú');back.type='button';
     back.onclick=()=>{stopReveal();if(G&&G.mode==='mp'){setPresence({st:'lobby',gid:null,words:null});renderLobby();show('sLobby')}else{renderMenu();show('sMenu')}};
     const share=el('button','btn ghost small','Compartir resultado');share.type='button';
