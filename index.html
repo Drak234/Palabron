@@ -967,6 +967,50 @@ body.res-on #sResults{z-index:1}
 .bcol.ghost .bbar{opacity:.8;background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--pc) 70%,#fff) 0 8px,var(--pc) 8px 16px)}
 
 .series-line{font-family:var(--f-display);font-weight:400;font-size:16px;color:var(--ink);text-align:center;padding:4px 10px;background:var(--t-yellow);border:2.5px solid var(--ink);border-radius:12px;box-shadow:0 2px 0 var(--ink)}
+
+/* ---------- Hall of fame: Hollywood walk ---------- */
+.slab[data-theme=gold]{--th:var(--gold);--th-d:var(--gold-d);--pat:var(--pat-star)}
+.fame-head{flex:none;position:relative;overflow:hidden;text-align:center;padding:18px 12px 16px;border-radius:20px;border:3px solid var(--ink);background:radial-gradient(120% 90% at 50% 0%,#3a2a5c 0%,#1b1530 60%,#110d1f 100%);box-shadow:0 6px 0 var(--ink)}
+.fame-beams i{position:absolute;bottom:-40px;width:90px;height:340px;background:linear-gradient(to top,rgba(255,240,180,.55),rgba(255,240,180,0));clip-path:polygon(40% 100%,60% 100%,100% 0,0 0);transform-origin:50% 100%;animation:beam 5s ease-in-out infinite alternate;pointer-events:none}
+.fame-beams i:nth-child(1){left:8%;--a:-28deg;--b:12deg}
+.fame-beams i:nth-child(2){right:8%;--a:28deg;--b:-12deg;animation-delay:-2.5s}
+@keyframes beam{from{transform:rotate(var(--a))}to{transform:rotate(var(--b))}}
+.fame-marquee{position:absolute;inset:6px;border-radius:14px;pointer-events:none;background:radial-gradient(circle,#ffe58a 0 2.2px,transparent 3px) 0 0/16px 16px;-webkit-mask:linear-gradient(#000 0 0) top/100% 8px no-repeat,linear-gradient(#000 0 0) bottom/100% 8px no-repeat;mask:linear-gradient(#000 0 0) top/100% 8px no-repeat,linear-gradient(#000 0 0) bottom/100% 8px no-repeat;animation:bulbs 1.2s steps(2) infinite}
+@keyframes bulbs{50%{background-position:8px 0}}
+.fame-title{position:relative;margin:6px 0 4px;font-family:var(--f-display);font-weight:400;font-size:34px;line-height:1.1;color:var(--gold);-webkit-text-stroke:7px #3a1d00;paint-order:stroke fill;text-shadow:0 0 18px rgba(255,200,60,.65)}
+.fame-sub{position:relative;font-family:var(--f-body);font-weight:800;font-size:13px;line-height:1.35;color:#f6e7c8}
+.fame-walk{flex:none;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:12px;border-radius:20px;border:3px solid var(--ink);box-shadow:0 6px 0 var(--ink);
+  background:repeating-linear-gradient(90deg,transparent 0 calc(50% - 2px),rgba(0,0,0,.35) calc(50% - 2px) calc(50% + 2px),transparent calc(50% + 2px) 100%),radial-gradient(circle at 20% 30%,#6b6470 0 1px,transparent 2px) 0 0/9px 9px,radial-gradient(circle at 70% 60%,#4a444f 0 1px,transparent 2px) 0 0/7px 7px,#2c2830}
+.fstar{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 6px 10px;border-radius:12px;background:linear-gradient(160deg,#3b3540,#25212a);box-shadow:inset 0 0 0 2px #8a6a2a,inset 0 0 0 4px #25212a,inset 0 0 0 5px #c9a14a;text-align:center;min-width:0;border:0;color:inherit;font:inherit;cursor:pointer}
+.fstar svg{width:76px;height:72px;filter:drop-shadow(0 2px 0 rgba(0,0,0,.5))}
+.fstar .fs-who{position:absolute;left:50%;top:38px;translate:-50% -50%;max-width:60px;padding:1px 0;font-family:var(--f-display);font-weight:400;font-size:13px;line-height:1.35;color:#7a4a00;white-space:nowrap;overflow:visible}
+.fstar .fs-cat{font-family:var(--f-display);font-weight:400;font-size:13px;line-height:1.15;color:#e8c776;letter-spacing:.02em;min-height:2.3em;display:flex;align-items:center}
+.fstar .fs-val{font-family:var(--f-display);font-weight:400;font-size:19px;line-height:1.1;color:#fff;-webkit-text-stroke:4px #2a1a00;paint-order:stroke fill;max-width:100%;white-space:nowrap;padding:1px 2px}
+.fstar .fs-meta{display:flex;align-items:center;gap:4px;justify-content:center;font-family:var(--f-body);font-weight:800;font-size:11px;color:#cbb991}
+.fstar .fs-meta canvas{width:22px;height:22px;border-radius:50%;background:#fff3}
+.fstar.empty svg{opacity:.35;filter:grayscale(1)}
+.fstar.empty .fs-val{color:#bba;-webkit-text-stroke:0;font-size:14px}
+.fstar.fresh{animation:fresh 1.6s ease-out 2}
+@keyframes fresh{50%{box-shadow:inset 0 0 0 2px #ffe58a,0 0 22px #ffd23f}}
+/* celebration */
+#fameCele{position:fixed;inset:0;z-index:80;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:20px;text-align:center;overflow:hidden;background:radial-gradient(90% 70% at 50% 40%,#3a2a5c,#120d20 70%);animation:celin .35s ease-out}
+@keyframes celin{from{opacity:0}}
+#fameCele .fame-beams i{bottom:-60px;height:110vh;width:140px}
+#fameCele .c-top{position:relative;font-family:var(--f-display);font-size:22px;color:#ffe58a;letter-spacing:.06em;animation:pop .5s cubic-bezier(.2,1.7,.4,1) .2s backwards}
+#fameCele .c-star{position:relative;width:min(62vw,240px);animation:stardrop .9s cubic-bezier(.25,1.5,.45,1) .35s backwards}
+#fameCele .c-star svg{width:100%;height:auto;filter:drop-shadow(0 0 30px rgba(255,210,63,.6))}
+#fameCele .c-star b{position:absolute;left:50%;top:50%;translate:-50% -40%;max-width:58%;font-family:var(--f-display);font-weight:400;font-size:clamp(18px,6vw,28px);line-height:1.3;color:#7a4a00;white-space:nowrap;overflow:visible}
+#fameCele .c-cat{position:relative;font-family:var(--f-display);font-size:26px;color:#fff;-webkit-text-stroke:6px #2a1a00;paint-order:stroke fill;animation:pop .5s cubic-bezier(.2,1.7,.4,1) 1s backwards}
+#fameCele .c-val{position:relative;font-family:var(--f-display);font-size:clamp(28px,9vw,44px);color:var(--gold);-webkit-text-stroke:7px #2a1a00;paint-order:stroke fill;animation:pop .5s cubic-bezier(.2,1.7,.4,1) 1.2s backwards;overflow-wrap:anywhere;max-width:100%}
+#fameCele .c-prev{position:relative;font-family:var(--f-body);font-weight:800;font-size:14px;color:#e8d8b8;animation:pop .4s ease-out 1.5s backwards}
+#fameCele .c-tap{position:relative;margin-top:10px;font-family:var(--f-body);font-weight:800;font-size:13px;color:#bfae8f;animation:pop .4s ease-out 2s backwards}
+#fameCele .flash{position:absolute;width:10px;height:10px;border-radius:50%;background:#fff;box-shadow:0 0 30px 14px #fff;opacity:0;animation:flash .5s ease-out forwards}
+@keyframes flash{15%{opacity:1}100%{opacity:0;transform:scale(2.4)}}
+@keyframes stardrop{0%{transform:translateY(-70vh) rotate(-200deg) scale(.4)}100%{transform:none}}
+@keyframes pop{0%{opacity:0;transform:scale(.4)}100%{opacity:1;transform:none}}
+.mention.rec{background:var(--gold)}
+.rec-badge{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--gold);border:2px solid var(--ink);font-family:var(--f-display);font-weight:400;font-size:13px;color:var(--ink);vertical-align:middle}
+@media (prefers-reduced-motion:reduce){.fame-beams i,.fame-marquee{animation:none}}
 /* ---------- footer v2: hint on top, Volver + main action in one row ---------- */
 #uiFoot{display:flex;flex-direction:column;gap:8px}
 #footRow{display:flex;align-items:center;gap:10px;pointer-events:auto}
@@ -1031,10 +1075,11 @@ body.foot-sm .screen.scroll{padding-bottom:96px}
       <button class="slab" data-theme="navy" id="btnDaily" type="button" data-hint="El mismo tablero para todo el mundo durante hoy. Compara tu puntuación con tus amigos."><span class="slab-face"><span class="slab-ic"><svg viewBox="0 0 32 32" aria-hidden="true"><rect x="5" y="7" width="22" height="20" rx="4" fill="#fff" stroke="#0d2547" stroke-width="2.6"/><path d="M5 13h22" stroke="#0d2547" stroke-width="2.6"/><path d="M11 4v6M21 4v6" stroke="#0d2547" stroke-width="2.6" stroke-linecap="round"/><path d="M16 15.5l1.6 3.2 3.5.5-2.5 2.5.6 3.5-3.2-1.7-3.2 1.7.6-3.5-2.5-2.5 3.5-.5z" fill="#ffd23f" stroke="#0d2547" stroke-width="1.4" stroke-linejoin="round"/></svg></span><span class="slab-t">Reto del día</span></span></button>
       <button class="slab" data-theme="pink" id="btnCreate" type="button" data-hint="Crea una sala y pásale el código a tus amigos. Tú eliges las reglas."><span class="slab-face"><span class="slab-ic"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M8 28V5" stroke="#0d2547" stroke-width="3" stroke-linecap="round"/><path d="M9 6h15l-3.5 5 3.5 5H9z" fill="#fff" stroke="#0d2547" stroke-width="2.6" stroke-linejoin="round"/><circle cx="8" cy="28" r="2.5" fill="#0d2547"/></svg></span><span class="slab-t">Crear sala</span></span></button>
       <button class="slab" data-theme="yellow" id="btnGoJoin" type="button" data-hint="Entra en la sala de un amigo con su código de 4 letras."><span class="slab-face"><span class="slab-ic"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="11" cy="12" r="7" fill="#fff" stroke="#0d2547" stroke-width="2.6"/><circle cx="11" cy="12" r="2.4" fill="#0d2547"/><path d="M16 16l10 10M21 21l3-3M24 24l3-3" stroke="#0d2547" stroke-width="3" stroke-linecap="round"/></svg></span><span class="slab-t">Unirme a sala</span></span></button>
+      <button class="slab" data-theme="gold" id="btnFame" type="button" data-hint="Los mejores récords jugados en este móvil: palabra más larga, más palabras, más puntos… ¿Quién se lleva su estrella?"><span class="slab-face"><span class="slab-ic"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3.5l3.6 7.6 8.3 1-6.1 5.7 1.6 8.2L16 22l-7.4 4 1.6-8.2-6.1-5.7 8.3-1z" fill="#ff8fb1" stroke="#0d2547" stroke-width="2.4" stroke-linejoin="round"/><path d="M16 9.5l1.6 3.4 3.7.4-2.7 2.5.7 3.7L16 17.7l-3.3 1.8.7-3.7-2.7-2.5 3.7-.4z" fill="#ffd23f"/></svg></span><span class="slab-t">Paseo de la Fama</span></span></button>
       <button class="slab" data-theme="lime" id="btnGoHelp" type="button" data-hint="Cómo se forman palabras, cuánto vale cada una y cómo evoluciona tu criatura."><span class="slab-face"><span class="slab-ic"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="12" fill="#fff" stroke="#0d2547" stroke-width="2.6"/><text x="16" y="22" text-anchor="middle" font-family="Lilita One,Arial Black" font-size="17" fill="#0d2547">?</text></svg></span><span class="slab-t">Cómo se juega</span></span></button>
     </nav>
     <p class="rules" id="bestLine"></p>
-    <div class="menu-mini"><button class="btn ghost small" id="btnSettings" type="button">Ajustes</button><span class="ver">Versión 4.0</span></div>
+    <div class="menu-mini"><button class="btn ghost small" id="btnSettings" type="button">Ajustes</button><span class="ver">Versión 4.1</span></div>
   </section>
 
   <!-- JOIN -->
@@ -1060,6 +1105,17 @@ body.foot-sm .screen.scroll{padding-bottom:96px}
       <div class="hvis hevo"><canvas id="hEvo0"></canvas><b>→</b><canvas id="hEvo1"></canvas><b>→</b><canvas id="hEvo2"></canvas></div>
       <div class="htxt">Tu criatura <b>evoluciona cada 25 puntos</b> y al final ¡combate!<span class="hex">En sala: «¡Única!» es una palabra que solo has encontrado tú; si la encontráis varios, es «repetida».</span></div></div>
     <button class="btn" id="helpOk" type="button">¡Entendido!</button>
+  </section>
+
+  <!-- HALL OF FAME -->
+  <section id="sFame" class="screen scroll" hidden>
+    <div class="fame-head">
+      <div class="fame-beams" aria-hidden="true"><i></i><i></i></div>
+      <div class="fame-marquee" aria-hidden="true"></div>
+      <h2 class="fame-title">Paseo de la Fama</h2>
+      <div class="fame-sub">Récords jugados en este móvil · ¡bátelos y tu nombre tendrá su estrella!</div>
+    </div>
+    <div class="fame-walk" id="fameWalk"></div>
   </section>
 
   <!-- PROFILE -->
@@ -1843,7 +1899,8 @@ function finishWaiting(){
 function stopReveal(){if(R){R.dead=true;R.skip=true;clearTimeout(R.timer);R=null}}
 
 function starsFor(score){if(!COMMON||!G)return null;const pot=G.sol.filter(w=>COMMON.has(w)).reduce((a,w)=>a+pts(w),0);if(!pot)return null;
-  const th=[.12,.25,.40].map(f=>Math.max(5,Math.round(pot*f)));const n=th.filter(t=>score>=t).length;return{n,th,next:n<3?th[n]-score:0}}
+  const mins=Math.max(1,(G.dur||60000)/60000),mult=Math.min(2.2,1+.6*(mins-1));/* longer rounds need more for each star */
+  const th=[.06,.12,.20].map(f=>Math.max(5,Math.round(pot*f*mult)));const n=th.filter(t=>score>=t).length;return{n,th,next:n<3?th[n]-score:0}}
 function findPath(b,w){
   const T=[...b].map(tileStr),used=new Uint8Array(CELLS);let res=null;
   const dfs=(i,pos,path)=>{const t=T[i];if(!w.startsWith(t,pos))return false;used[i]=1;path.push(i);const np=pos+t.length;
@@ -2077,6 +2134,12 @@ function showResults(players){
       if(me.comeback>=0)tag(me.comeback,'¡Remontada!');
       players.forEach((p,i)=>{const bw=[...p.words].sort((a,b)=>pts(b)-pts(a))[0];tag(i,bw?'Su mejor: '+accent(bw).toUpperCase():'¡A por la revancha!')})}
     setTimeout(()=>{if(!me.dead)stage.classList.add('folded')},2600);
+    {const broken=fameCheck(players,totals,counts,order,win);if(broken.length){
+      const mark=new Set(broken.map(b=>b.rec.who));cols.forEach((cd,i)=>{if(mark.has(players[i].nick)&&!players[i].ghost)cd.c.append(el('div','mention rec','★ Récord'))});
+      /* beaten records get the full show; brand-new ones are grouped into a single star */
+      const beaten=broken.filter(b=>b.old),fresh=broken.filter(b=>!b.old);
+      const show=beaten.length?beaten.slice(0,3):[{k:'_new',old:null,rec:{who:fresh.map(b=>b.rec.who).filter((v,i,a)=>a.indexOf(v)===i).join(' y '),v:fresh.length}}];
+      setTimeout(()=>{if(!me.dead&&screen==='sResults')fameCelebrate(show)},3400)}}
     /* actions right under the race, so "Otra partida" never needs scrolling */
     const acts=el('div','res-acts');body.append(acts);
     players.forEach((p,pi)=>{
@@ -2200,8 +2263,8 @@ function confetti(){
 }
 
 /* ================= UI 2.0: arena backdrop, slab menus, hint bar, screen transitions ================= */
-const HINTS={sMenu:null,sProfile:'Evoluciona cada 25 puntos. Las formas oscuras se desbloquean al alcanzarlas en una partida.',sJoin:'Pídele a tu amigo el código de 4 letras de su sala.',sHelp:'',sLobby:''};
-const BACK={sProfile:()=>{const nk=($('#nickIn').value||'').trim();if(profile&&(draft.av.c!==profile.av.c||(nk&&nk!==profile.nick)||!!profile.handi!==$('#handiIn').checked)){$('#saveProf').onclick();toast('Cambios guardados');return}show(named?'sLobby':'sMenu',true)},sJoin:()=>show('sMenu',true),sHelp:()=>show('sMenu',true),sLobby:async()=>{if(await confirmBox('¿Salir de la sala?',amHost()&&peers.length>1?'Eres el anfitrión: si sales, la sala se cierra para todos.':'Podrás volver a entrar con el código.','Salir','Quedarme')){goBack=true;leaveRoom()}}};
+const HINTS={sFame:'',sMenu:null,sProfile:'Evoluciona cada 25 puntos. Las formas oscuras se desbloquean al alcanzarlas en una partida.',sJoin:'Pídele a tu amigo el código de 4 letras de su sala.',sHelp:'',sLobby:''};
+const BACK={sProfile:()=>{const nk=($('#nickIn').value||'').trim();if(profile&&(draft.av.c!==profile.av.c||(nk&&nk!==profile.nick)||!!profile.handi!==$('#handiIn').checked)){$('#saveProf').onclick();toast('Cambios guardados');return}show(named?'sLobby':'sMenu',true)},sJoin:()=>show('sMenu',true),sHelp:()=>show('sMenu',true),sFame:()=>show('sMenu',true),sLobby:async()=>{if(await confirmBox('¿Salir de la sala?',amHost()&&peers.length>1?'Eres el anfitrión: si sales, la sala se cierra para todos.':'Podrás volver a entrar con el código.','Salir','Quedarme')){goBack=true;leaveRoom()}}};
 let goBack=false;
 function setHint(t){const s=$('#hintBar span');if(!s||!t||s.textContent===t)return;s.textContent=t;s.classList.remove('in');void s.offsetWidth;s.classList.add('in');const hb=$('#hintBar');if(hb.animate&&!REDUCE)hb.animate([{scale:'1'},{scale:'1.03'},{scale:'1'}],{duration:260,easing:'ease-out'})}
 /* the footer holds Volver + the screen's main action side by side, so nothing ever hides under it */
@@ -2450,6 +2513,72 @@ $('#btnSettings').onclick=()=>{ac();
   v.append(b);document.body.append(v);v.onclick=e=>{if(e.target===v)v.remove()};
   A(b,[{transform:'scale(.7)',opacity:0},{transform:'scale(1.04)',opacity:1,offset:.6},{transform:'none',opacity:1}],{duration:320,easing:'ease-out'})};
 
+/* ---------- Paseo de la Fama: records played on this phone ---------- */
+const STAR_SVG='<svg viewBox="0 0 100 95" aria-hidden="true"><path d="M50 3l13.6 28.3 31 3.9-22.8 21.4 5.9 30.8L50 72.3 22.3 87.4l5.9-30.8L5.4 35.2l31-3.9z" fill="#f79bb3" stroke="#c9a14a" stroke-width="4" stroke-linejoin="round"/><path d="M50 13l10.8 22.4 24.6 3.1-18.1 17 4.7 24.4L50 68 28 79.9l4.7-24.4-18.1-17 24.6-3.1z" fill="none" stroke="#ffd98a" stroke-width="1.6" opacity=".9"/></svg>';
+const FAME=[
+  {k:'long',cat:'Palabra más larga',fmt:r=>accent(r.w).toUpperCase(),sub:r=>r.v+' letras'},
+  {k:'best',cat:'Palabra de más valor',fmt:r=>accent(r.w).toUpperCase(),sub:r=>'+'+r.v+' puntos'},
+  {k:'pts60',cat:'Más puntos · 1 minuto',fmt:r=>r.v+' pts'},
+  {k:'pts120',cat:'Más puntos · 2 minutos',fmt:r=>r.v+' pts'},
+  {k:'pts180',cat:'Más puntos · 3 minutos',fmt:r=>r.v+' pts'},
+  {k:'words',cat:'Más palabras en una partida',fmt:r=>r.v+' palabras',sub:r=>r.d?(r.d/60)+' min':''},
+  {k:'long7',cat:'Más palabras de 7+ letras',fmt:r=>r.v+' largas'},
+  {k:'avg',cat:'Mejor media de letras',fmt:r=>r.v.toFixed(2)+' letras',sub:()=>'mín. 8 palabras'},
+  {k:'uniq',cat:'Más palabras únicas en sala',fmt:r=>r.v+' únicas'},
+  {k:'margin',cat:'Paliza más grande',fmt:r=>'+'+r.v+' pts',sub:r=>r.o?'a '+r.o:''},
+  {k:'daily',cat:'Mejor reto del día',fmt:r=>r.v+' pts',sub:r=>r.n?'reto nº '+r.n:''},
+  {k:'streak',cat:'Racha del reto',fmt:r=>r.v+(r.v===1?' día':' días')},
+  {k:'games',cat:'Jugador más fiel',fmt:r=>r.v+' partidas'},
+  {k:'evo',cat:'Criatura más evolucionada',fmt:r=>crName(r.c,r.v),sub:r=>'forma '+(r.v+1)+' de '+(MAXS+1)}
+];
+const fameGet=()=>store.get('fame',{})||{};
+function fameRender(fresh){
+  const box=$('#fameWalk');if(!box)return;const F=fameGet();box.replaceChildren();
+  FAME.forEach((d,i)=>{const r=F[d.k];const b=el('button','fstar'+(r?'':' empty')+(fresh&&fresh.includes(d.k)?' fresh':''));b.type='button';
+    b.insertAdjacentHTML('afterbegin',STAR_SVG);b.append(el('span','fs-who',r?r.who:'¿?'),el('span','fs-cat',d.cat),el('span','fs-val',r?d.fmt(r):'Sin dueño'));
+    if(r){const m=el('span','fs-meta');const cv=el('canvas');drawCr(cv,cleanAv({c:r.c}).c,0,22,0);m.append(cv,document.createTextNode((d.sub&&d.sub(r)?d.sub(r)+' · ':'')+new Date(r.t).toLocaleDateString('es-ES',{day:'numeric',month:'short'})));b.append(m)}
+    b.onclick=()=>{sfx.tile(3);if(r)toast(d.cat+': '+d.fmt(r)+' — '+r.who,2600);else toast('Este récord no tiene dueño. ¡Juega y llévatelo!',2400)};
+    box.append(b);setTimeout(()=>{fitText(b.querySelector('.fs-who'),13,7);if(r)fitText(b.querySelector('.fs-val'),19,10)},450);A(b,[{transform:'translateY(18px) scale(.85)',opacity:0},{transform:'none',opacity:1}],{duration:380,delay:i*45,easing:'cubic-bezier(.2,1.5,.4,1)',fill:'backwards'})});
+}
+$('#btnFame').onclick=()=>{ac();fameRender(fameJustBroken);fameJustBroken=null;show('sFame');sfx.coin()};
+let fameJustBroken=null;
+/* called when a round's results are final: every player that beats a record gets their star */
+function fameCheck(players,totals,counts,order,win){
+  if(!G||G.zen)return[];const F=fameGet(),broken=[],now=Date.now();
+  const put=(k,val,who,c,extra)=>{const old=F[k];if(old&&!(val>old.v))return;F[k]={v:val,who,c,t:now,...extra};broken.push({k,old,rec:F[k]})};
+  const games=store.get('fameGames',{})||{};
+  players.forEach((p,i)=>{if(p.ghost)return;const ws=p.words||[],c=p.av.c;games[p.nick]=(games[p.nick]||0)+1;
+    if(ws.length){const lw=ws.reduce((a,w)=>w.length>a.length?w:a,'');put('long',lw.length,p.nick,c,{w:lw});
+      const bw=ws.reduce((a,w)=>pts(w)>pts(a)?w:a,ws[0]);put('best',pts(bw),p.nick,c,{w:bw});
+      put('words',ws.length,p.nick,c,{d:G.dur/1000});const l7=ws.filter(w=>w.length>=7).length;if(l7)put('long7',l7,p.nick,c);
+      if(ws.length>=8)put('avg',Math.round(ws.reduce((a,w)=>a+w.length,0)/ws.length*100)/100,p.nick,c)}
+    if(totals[i]>0&&[60,120,180].includes(G.dur/1000))put('pts'+G.dur/1000,totals[i],p.nick,c);
+    if(G.mode==='mp'){const u=order.filter(o=>o.f.length===1&&o.f[0]===i).length;if(u)put('uniq',u,p.nick,c)}
+    const st=Math.min(Math.floor(totals[i]/TIER_STEP),MAXS);if(st>0){const old=F.evo;if(!old||st>old.v)put('evo',st,p.nick,p.av.c)}});
+  if(G.mode==='mp'&&win.length===1&&players.length>1){const sec=Math.max(...totals.filter((t,i)=>i!==win[0]));const o=players.filter((p,i)=>i!==win[0]&&totals[i]===sec)[0];put('margin',totals[win[0]]-sec,players[win[0]].nick,players[win[0]].av.c,{o:o?o.nick:''})}
+  if(G.daily){const mi=players.findIndex(p=>p.me);if(mi>=0){put('daily',totals[mi],players[mi].nick,players[mi].av.c,{n:dailyNum(G.daily)});put('streak',store.get('streak',0),players[mi].nick,players[mi].av.c)}}
+  const top=Object.entries(games).sort((a,b)=>b[1]-a[1])[0];if(top&&top[1]>=3){const holder=players.find(p=>p.nick===top[0]);const old=F.games;if(!old||top[1]>old.v){F.games={v:top[1],who:top[0],c:holder?holder.av.c:(old?old.c:0),t:now};if(!old||old.who!==top[0])broken.push({k:'games',old,rec:F.games})}}
+  store.set('fameGames',games);store.set('fame',F);
+  if(broken.length)fameJustBroken=broken.map(b=>b.k);
+  return broken;
+}
+/* the big moment: spotlights, a star dropping onto the walk, camera flashes */
+async function fameCelebrate(list){
+  for(const [n,b] of list.slice(0,4).entries()){
+    const d=b.k==='_new'?{cat:'Estrenas el Paseo de la Fama',fmt:r=>r.v+(r.v===1?' estrella nueva':' estrellas nuevas')}:FAME.find(x=>x.k===b.k);await new Promise(res=>{
+      const v=el('div');v.id='fameCele';v.setAttribute('role','dialog');v.setAttribute('aria-label','Nuevo récord');
+      v.innerHTML='<div class="fame-beams" aria-hidden="true"><i></i><i></i></div>';
+      const star=el('div','c-star');star.insertAdjacentHTML('afterbegin',STAR_SVG);star.append(el('b',null,b.rec.who));
+      v.append(el('div','c-top','★ ¡NUEVO RÉCORD! ★'),star,el('div','c-cat',d.cat),el('div','c-val',d.fmt(b.rec)),
+        el('div','c-prev',b.old?'Antes: '+d.fmt(b.old)+' · '+b.old.who:b.k==='_new'?'Míralas en el menú → Paseo de la Fama':'¡El primero en conseguirlo!'),el('div','c-tap',list.length>1&&n<Math.min(list.length,4)-1?'Toca para ver el siguiente':'Toca para seguir'));
+      document.body.append(v);requestAnimationFrame(()=>fitText(star.querySelector('b'),28,11));
+      if(!REDUCE){sfx.fanfare();setTimeout(()=>{sfx.evolve();vib([40,30,40,30,160])},900);
+        for(let k=0;k<14;k++)setTimeout(()=>{if(!v.isConnected)return;const f=el('i','flash');f.style.left=(5+Math.random()*90)+'%';f.style.top=(55+Math.random()*40)+'%';v.append(f);setTimeout(()=>f.remove(),600)},300+k*170);
+        setTimeout(()=>{const r=star.getBoundingClientRect();if(r.width)for(let k=0;k<3;k++)setTimeout(()=>FX.rocket(r.left+r.width*(.2+.3*k),r.top+r.height/2,Math.max(30,r.top-60),['#fff','#ffd23f','#f79bb3'],40,4),k*200);confetti()},1100)}
+      let done=false;const close=()=>{if(done)return;done=true;A(v,[{opacity:1},{opacity:0}],{duration:250}).finished.then(()=>v.remove()).catch(()=>v.remove());res()};
+      setTimeout(()=>{v.onclick=close},700);setTimeout(close,5200)});
+  }
+}
 /* ---------- daily challenge: same board for everyone today ---------- */
 const DAY0=Date.UTC(2026,9,26);
 const dailyNum=k=>{const[y,m,d]=k.split('-').map(Number);return Math.round((Date.UTC(y,m-1,d)-DAY0)/864e5)+1};
