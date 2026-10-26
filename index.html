@@ -1075,11 +1075,11 @@ body.foot-sm .screen.scroll{padding-bottom:96px}
       <button class="slab" data-theme="navy" id="btnDaily" type="button" data-hint="El mismo tablero para todo el mundo durante hoy. Compara tu puntuación con tus amigos."><span class="slab-face"><span class="slab-ic"><svg viewBox="0 0 32 32" aria-hidden="true"><rect x="5" y="7" width="22" height="20" rx="4" fill="#fff" stroke="#0d2547" stroke-width="2.6"/><path d="M5 13h22" stroke="#0d2547" stroke-width="2.6"/><path d="M11 4v6M21 4v6" stroke="#0d2547" stroke-width="2.6" stroke-linecap="round"/><path d="M16 15.5l1.6 3.2 3.5.5-2.5 2.5.6 3.5-3.2-1.7-3.2 1.7.6-3.5-2.5-2.5 3.5-.5z" fill="#ffd23f" stroke="#0d2547" stroke-width="1.4" stroke-linejoin="round"/></svg></span><span class="slab-t">Reto del día</span></span></button>
       <button class="slab" data-theme="pink" id="btnCreate" type="button" data-hint="Crea una sala y pásale el código a tus amigos. Tú eliges las reglas."><span class="slab-face"><span class="slab-ic"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M8 28V5" stroke="#0d2547" stroke-width="3" stroke-linecap="round"/><path d="M9 6h15l-3.5 5 3.5 5H9z" fill="#fff" stroke="#0d2547" stroke-width="2.6" stroke-linejoin="round"/><circle cx="8" cy="28" r="2.5" fill="#0d2547"/></svg></span><span class="slab-t">Crear sala</span></span></button>
       <button class="slab" data-theme="yellow" id="btnGoJoin" type="button" data-hint="Entra en la sala de un amigo con su código de 4 letras."><span class="slab-face"><span class="slab-ic"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="11" cy="12" r="7" fill="#fff" stroke="#0d2547" stroke-width="2.6"/><circle cx="11" cy="12" r="2.4" fill="#0d2547"/><path d="M16 16l10 10M21 21l3-3M24 24l3-3" stroke="#0d2547" stroke-width="3" stroke-linecap="round"/></svg></span><span class="slab-t">Unirme a sala</span></span></button>
-      <button class="slab" data-theme="gold" id="btnFame" type="button" data-hint="Los mejores récords jugados en este móvil: palabra más larga, más palabras, más puntos… ¿Quién se lleva su estrella?"><span class="slab-face"><span class="slab-ic"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3.5l3.6 7.6 8.3 1-6.1 5.7 1.6 8.2L16 22l-7.4 4 1.6-8.2-6.1-5.7 8.3-1z" fill="#ff8fb1" stroke="#0d2547" stroke-width="2.4" stroke-linejoin="round"/><path d="M16 9.5l1.6 3.4 3.7.4-2.7 2.5.7 3.7L16 17.7l-3.3 1.8.7-3.7-2.7-2.5 3.7-.4z" fill="#ffd23f"/></svg></span><span class="slab-t">Paseo de la Fama</span></span></button>
+      <button class="slab" data-theme="gold" id="btnFame" type="button" data-hint="Los récords de toda la gente que juega a Palabrón: palabra más larga, más palabras, más puntos… Si lo bates, la estrella pasa a ser tuya."><span class="slab-face"><span class="slab-ic"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3.5l3.6 7.6 8.3 1-6.1 5.7 1.6 8.2L16 22l-7.4 4 1.6-8.2-6.1-5.7 8.3-1z" fill="#ff8fb1" stroke="#0d2547" stroke-width="2.4" stroke-linejoin="round"/><path d="M16 9.5l1.6 3.4 3.7.4-2.7 2.5.7 3.7L16 17.7l-3.3 1.8.7-3.7-2.7-2.5 3.7-.4z" fill="#ffd23f"/></svg></span><span class="slab-t">Paseo de la Fama</span></span></button>
       <button class="slab" data-theme="lime" id="btnGoHelp" type="button" data-hint="Cómo se forman palabras, cuánto vale cada una y cómo evoluciona tu criatura."><span class="slab-face"><span class="slab-ic"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="12" fill="#fff" stroke="#0d2547" stroke-width="2.6"/><text x="16" y="22" text-anchor="middle" font-family="Lilita One,Arial Black" font-size="17" fill="#0d2547">?</text></svg></span><span class="slab-t">Cómo se juega</span></span></button>
     </nav>
     <p class="rules" id="bestLine"></p>
-    <div class="menu-mini"><button class="btn ghost small" id="btnSettings" type="button">Ajustes</button><span class="ver">Versión 4.1</span></div>
+    <div class="menu-mini"><button class="btn ghost small" id="btnSettings" type="button">Ajustes</button><span class="ver">Versión 4.2</span></div>
   </section>
 
   <!-- JOIN -->
@@ -1113,7 +1113,7 @@ body.foot-sm .screen.scroll{padding-bottom:96px}
       <div class="fame-beams" aria-hidden="true"><i></i><i></i></div>
       <div class="fame-marquee" aria-hidden="true"></div>
       <h2 class="fame-title">Paseo de la Fama</h2>
-      <div class="fame-sub">Récords jugados en este móvil · ¡bátelos y tu nombre tendrá su estrella!</div>
+      <div class="fame-sub" id="fameNote">Récords de toda la gente que juega a Palabrón · ¡bátelos y la estrella será tuya!</div>
     </div>
     <div class="fame-walk" id="fameWalk"></div>
   </section>
@@ -2134,12 +2134,12 @@ function showResults(players){
       if(me.comeback>=0)tag(me.comeback,'¡Remontada!');
       players.forEach((p,i)=>{const bw=[...p.words].sort((a,b)=>pts(b)-pts(a))[0];tag(i,bw?'Su mejor: '+accent(bw).toUpperCase():'¡A por la revancha!')})}
     setTimeout(()=>{if(!me.dead)stage.classList.add('folded')},2600);
-    {const broken=fameCheck(players,totals,counts,order,win);if(broken.length){
+    fameSubmit(players,totals,counts,order,win).then(broken=>{if(me.dead||!broken.length)return;{
       const mark=new Set(broken.map(b=>b.rec.who));cols.forEach((cd,i)=>{if(mark.has(players[i].nick)&&!players[i].ghost)cd.c.append(el('div','mention rec','★ Récord'))});
       /* beaten records get the full show; brand-new ones are grouped into a single star */
       const beaten=broken.filter(b=>b.old),fresh=broken.filter(b=>!b.old);
       const show=beaten.length?beaten.slice(0,3):[{k:'_new',old:null,rec:{who:fresh.map(b=>b.rec.who).filter((v,i,a)=>a.indexOf(v)===i).join(' y '),v:fresh.length}}];
-      setTimeout(()=>{if(!me.dead&&screen==='sResults')fameCelebrate(show)},3400)}}
+      setTimeout(()=>{if(!me.dead&&screen==='sResults')fameCelebrate(show)},3000)}});
     /* actions right under the race, so "Otra partida" never needs scrolling */
     const acts=el('div','res-acts');body.append(acts);
     players.forEach((p,pi)=>{
@@ -2540,9 +2540,36 @@ function fameRender(fresh){
     b.onclick=()=>{sfx.tile(3);if(r)toast(d.cat+': '+d.fmt(r)+' — '+r.who,2600);else toast('Este récord no tiene dueño. ¡Juega y llévatelo!',2400)};
     box.append(b);setTimeout(()=>{fitText(b.querySelector('.fs-who'),13,7);if(r)fitText(b.querySelector('.fs-val'),19,10)},450);A(b,[{transform:'translateY(18px) scale(.85)',opacity:0},{transform:'none',opacity:1}],{duration:380,delay:i*45,easing:'cubic-bezier(.2,1.5,.4,1)',fill:'backwards'})});
 }
-$('#btnFame').onclick=()=>{ac();fameRender(fameJustBroken);fameJustBroken=null;show('sFame');sfx.coin()};
+$('#btnFame').onclick=()=>{ac();const fr=fameJustBroken;fameJustBroken=null;fameRender(fr);show('sFame');sfx.coin();
+  fetch(FAME_API,{cache:'no-store'}).then(r=>r.ok?r.json():Promise.reject()).then(d=>{store.set('fame',d.records||{});fameShared=true;if(screen==='sFame')fameRender(fr);$('#fameNote').textContent='Récords de toda la gente que juega a Palabrón · ¡bátelos y la estrella será tuya!'}).catch(()=>{$('#fameNote').textContent='Sin conexión: estás viendo la última copia guardada.'});fameFlush()};
 let fameJustBroken=null;
-/* called when a round's results are final: every player that beats a record gets their star */
+/* shared record book: one Paseo de la Fama for everybody who plays Palabrón (stored on the site's server) */
+const FAME_API='/api/fame';
+function fameFeats(players,totals,counts,order,win){
+  const feats=[],plays=[];
+  players.forEach((p,i)=>{if(p.ghost)return;const ws=(p.words||[]).filter(w=>/^[a-zñ]{3,20}$/.test(w)),c=p.av.c,who=p.nick;plays.push({n:who,c});
+    if(ws.length){const lw=ws.reduce((a,w)=>w.length>a.length?w:a,'');feats.push({k:'long',v:lw.length,who,c,w:lw});
+      const bw=ws.reduce((a,w)=>pts(w)>pts(a)?w:a,ws[0]);feats.push({k:'best',v:pts(bw),who,c,w:bw});
+      feats.push({k:'words',v:ws.length,who,c,d:G.dur/1000});const l7=ws.filter(w=>w.length>=7).length;if(l7)feats.push({k:'long7',v:l7,who,c});
+      if(ws.length>=8)feats.push({k:'avg',v:Math.round(ws.reduce((a,w)=>a+w.length,0)/ws.length*100)/100,who,c})}
+    if(totals[i]>0&&[60,120,180].includes(G.dur/1000))feats.push({k:'pts'+G.dur/1000,v:totals[i],who,c});
+    if(G.mode==='mp'){const u=order.filter(o=>o.f.length===1&&o.f[0]===i).length;if(u)feats.push({k:'uniq',v:u,who,c})}
+    const st=Math.min(Math.floor(totals[i]/TIER_STEP),MAXS);if(st>0)feats.push({k:'evo',v:st,who,c})});
+  if(G.mode==='mp'&&win.length===1&&players.length>1){const sec=Math.max(...totals.filter((t,i)=>i!==win[0]));const o=players.filter((p,i)=>i!==win[0]&&totals[i]===sec)[0];if(totals[win[0]]-sec>0)feats.push({k:'margin',v:totals[win[0]]-sec,who:players[win[0]].nick,c:players[win[0]].av.c,o:o?o.nick:''})}
+  if(G.daily){const mi=players.findIndex(p=>p.me);if(mi>=0){feats.push({k:'daily',v:totals[mi],who:players[mi].nick,c:players[mi].av.c,n:dailyNum(G.daily)});const sk=store.get('streak',0);if(sk)feats.push({k:'streak',v:sk,who:players[mi].nick,c:players[mi].av.c})}}
+  return{gid:(G.mode==='mp'&&G.game&&G.game.id?'m'+G.game.id:'s'+Math.random().toString(36).slice(2,12)),plays,feats};
+}
+async function famePost(body){const r=await fetch(FAME_API,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});if(!r.ok)throw new Error('http '+r.status);return r.json()}
+async function fameFlush(){const q=store.get('famePending',[])||[];if(!q.length)return;const left=[];for(const b of q){try{const r=await famePost(b);store.set('fame',r.records||{})}catch(e){left.push(b)}}store.set('famePending',left.slice(-30))}
+async function fameSubmit(players,totals,counts,order,win){
+  if(!G||G.zen)return[];const body=fameFeats(players,totals,counts,order,win);
+  try{const r=await Promise.race([famePost(body),new Promise((_,j)=>setTimeout(()=>j(new Error('timeout')),6000))]);store.set('fame',r.records||{});fameShared=true;
+    const broken=(r.broken||[]).map(b=>({k:b.k,old:b.old,rec:b.rec}));if(broken.length)fameJustBroken=broken.map(b=>b.k);fameFlush();return broken}
+  catch(e){/* offline: judge against the last copy we saw, and send it when we are back online */
+    const q=store.get('famePending',[])||[];q.push(body);store.set('famePending',q.slice(-30));return fameCheck(players,totals,counts,order,win)}
+}
+let fameShared=false;
+/* offline fallback: compare with the cached copy */
 function fameCheck(players,totals,counts,order,win){
   if(!G||G.zen)return[];const F=fameGet(),broken=[],now=Date.now();
   const put=(k,val,who,c,extra)=>{const old=F[k];if(old&&!(val>old.v))return;F[k]={v:val,who,c,t:now,...extra};broken.push({k,old,rec:F[k]})};
@@ -2607,6 +2634,7 @@ $('#btnDaily').onclick=async()=>{ac();
   if(!DICT.length||!COMMON){const ov=$('#overlay');ov.hidden=false;ov.replaceChildren(el('div','big small','Cargando…'));try{await dictP;await commonP}catch(e){ov.hidden=true;return}ov.hidden=true}
   const k=todayKey();beginRound({board:dailyBoard(k),mode:'solo',soloT:120,minL:3,daily:k})};
 renderDaily();
+setTimeout(()=>{try{fameFlush()}catch(e){}},4000);
 /* solo: pick the time (or no clock at all) — remembered for next time */
 $('#btnSolo').onclick=()=>{ac();
   const v=el('div','cbox-veil'),b=el('div','cbox card');b.setAttribute('role','dialog');b.append(el('div','cbox-t','¿Cuánto tiempo?'));
