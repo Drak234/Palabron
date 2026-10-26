@@ -3,8 +3,8 @@
    - Heavy, rarely-changing files (dictionary, creatures, fonts, icons) are cache-first:
      the game opens instantly and works offline once it has been visited.
    Bump VERSION whenever dic.txt, a sprite or a font changes. */
-const VERSION='palabron-v8';
-const CORE=['./','index.html','manifest.webmanifest','dic.txt','icon-180.png','icon-192.png','icon-512.png',
+const VERSION='palabron-v10';
+const CORE=['./','index.html','manifest.webmanifest','dic.txt','comunes.txt','icon-180.png','icon-192.png','icon-512.png',
   'fonts/lilita-one.woff2','fonts/nunito-700.woff2','fonts/nunito-800.woff2','fonts/nunito-900.woff2','vendor/peerjs.min.js'];
 const LINES=['fuego','agua','planta','rayo','hielo','bicho','viento','sombra','tierra','normal','fantasma','planta2','fuego2'];
 const SPRITES=LINES.flatMap(n=>Array.from({length:8},(_,i)=>`criaturas/${n}-${i+1}.webp`));
